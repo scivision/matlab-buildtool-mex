@@ -28,8 +28,8 @@ find_package(Matlab COMPONENTS MAIN_PROGRAM ENG_LIBRARY MAT_LIBRARY MX_LIBRARY M
 matlab_get_release_name_from_version(${Matlab_VERSION_STRING} Matlab_release)
 message(STATUS "Matlab: ${Matlab_release} ${Matlab_VERSION_STRING}")
 
-if(Matlab_VERSION_STRING VERSION_LESS 9.14)
-  message(WARNING "Matlab >= 9.14 (R2023a) is required for MEX tests to work due to new buildtool argument syntax.")
+if(Matlab_release VERSION_LESS R2023a)
+  message(WARNING "Matlab >= R2023a is required for MEX tests to work due to new buildtool argument syntax.")
 endif()
 
 # --- Matlab paths and libs
