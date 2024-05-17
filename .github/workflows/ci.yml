@@ -2,6 +2,8 @@ name: matlab
 
 env:
   CTEST_NO_TESTS_ACTION: error
+  CMAKE_BUILD_PARALLEL_LEVEL: 4
+  CTEST_PARALLEL_LEVEL: 0
 
 on:
   push:
@@ -20,10 +22,10 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        matlab: [R2023a, R2023b]
+        matlab: [R2023a, R2024a]
         include:
           - os: macos-latest
-            matlab: R2023b
+            matlab: R2024a
 
     runs-on: ${{ matrix.os }}
 
@@ -60,7 +62,7 @@ jobs:
   msvc:
     strategy:
       matrix:
-        matlab: [R2023a]
+        matlab: [R2024a]
   # R2023b didn't work with MSVC on GitHub Actions in Sept 2023.
 
     runs-on: windows-latest
