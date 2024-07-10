@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.22...3.27)
+cmake_minimum_required(VERSION 3.22...3.30)
 # 3.22 ENVIRONMENT_MODIFICATION and FindMatlab new targets
 
 if(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
