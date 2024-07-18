@@ -22,10 +22,10 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        matlab: [R2023a, R2024a]
+        matlab: [R2023a, latest-including-prerelease]
         include:
           - os: macos-latest
-            matlab: R2024a
+            matlab: latest-including-prerelease
 
     runs-on: ${{ matrix.os }}
 
@@ -62,7 +62,7 @@ jobs:
   msvc:
     strategy:
       matrix:
-        matlab: [R2024a]
+        matlab: [R2024a, latest-including-prerelease]
   # R2023b didn't work with MSVC on GitHub Actions in Sept 2023.
 
     runs-on: windows-latest
