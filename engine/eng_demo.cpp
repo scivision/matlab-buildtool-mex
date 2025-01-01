@@ -8,14 +8,12 @@
 
 void diagnose(void)
 {
-	char* p = getenv("LD_LIBRARY_PATH");
-	if(p) printf("LD_LIBRARY_PATH: %s\n", p);
-
-	p = getenv("DYLD_LIBRARY_PATH");
-	if(p) printf("DYLD_LIBRARY_PATH: %s\n", p);
-
-	p = getenv("PATH");
-	if(p) printf("PATH: %s\n", p);
+    const char* envVars[] = { "LD_LIBRARY_PATH", "DYLD_LIBRARY_PATH", "PATH" };
+    for (auto& envVar : envVars) {
+        char* p = std::getenv(envVar);
+        if (p)
+            std::cout << envVar << ": " << p << "\n";
+    }
 }
 
 int main() {
@@ -59,7 +57,7 @@ int main() {
     // Display the result
     int i = 0;
     for (auto r : A) {
-        std::cout << "results[" << i << "] = " << r << std::endl;
+        std::cout << "results[" << i << "] = " << r << "\n";
         ++i;
     }
 
