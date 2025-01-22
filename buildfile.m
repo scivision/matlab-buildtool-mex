@@ -1,5 +1,5 @@
 function plan = buildfile
-assert(~isMATLABReleaseOlderThan("R2023b"))
+assert(~isMATLABReleaseOlderThan("R2024b"))
 
 plan = buildplan();
 
@@ -12,14 +12,14 @@ plan("check") = matlab.buildtool.tasks.CodeIssuesTask(".", IncludeSubfolders=tru
     WarningThreshold=0);
     % Results="code-issues.sarif");
 
-addpath(bindir)
+addpath(bindir, plan.RootFolder + "/mex")
 
-plan("test") = matlab.buildtool.tasks.TestTask(...
-    fullfile(plan.RootFolder, "mex"), Strict=false);
+plan("test:mex:blas") = matlab.buildtool.tasks.TestTask("TestMex/test_blas");
+plan("test:mex:array") = matlab.buildtool.tasks.TestTask("TestMex/test_cpp_array");
+plan("test:mex:fortran") = matlab.buildtool.tasks.TestTask("TestMex/test_fortran_mex");
 
 plan("clean") = matlab.buildtool.tasks.CleanTask;
 
-if isMATLABReleaseOlderThan("R2024b"), return, end
 %% MexTask
 example_dir = fullfile(matlabroot, "extern/examples");
 

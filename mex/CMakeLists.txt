@@ -23,10 +23,9 @@ set(c_mex_dir $<TARGET_FILE_DIR:matrixMultiply>)
 endif()
 
 add_test(NAME C_MEX_BLAS
-COMMAND ${Matlab_MAIN_PROGRAM} -sd ${PROJECT_SOURCE_DIR}
-  -batch "buildtool test('${CMAKE_CURRENT_SOURCE_DIR}', 'TestMex/test_blas', '${c_mex_dir}')"
+COMMAND ${Matlab_MAIN_PROGRAM} -sd ${PROJECT_SOURCE_DIR} -batch "buildtool test:mex:blas"
 )
-set_property(TEST C_MEX_BLAS PROPERTY DISABLED $<NOT:$<AND:$<BOOL:${matmul_src}>,$<BOOL:${Matlab_MEX_BLAS}>,$<BOOL:${Matlab_MEX_BLAS}>>>)
+set_property(TEST C_MEX_BLAS PROPERTY DISABLED $<OR:$<NOT:$<TARGET_EXISTS:matrixMultiply>>,$<VERSION_LESS:${Matlab_VERSION},24.2>>)
 
 # --- C++ Mex called from Matlab
 
@@ -47,11 +46,10 @@ set(cxx_mex_dir $<TARGET_FILE_DIR:arrayProduct>)
 endif()
 
 add_test(NAME CppMex
-COMMAND ${Matlab_MAIN_PROGRAM} -sd ${PROJECT_SOURCE_DIR}
-  -batch "buildtool test('${CMAKE_CURRENT_SOURCE_DIR}', 'TestMex/test_cpp_array', '${cxx_mex_dir}')"
+COMMAND ${Matlab_MAIN_PROGRAM} -sd ${PROJECT_SOURCE_DIR} -batch "buildtool test:mex:array"
 )
 
-set_property(TEST CppMex PROPERTY DISABLED $<NOT:$<AND:$<BOOL:${array_src}>,$<BOOL:${Matlab_mex_CXX}>>>)
+set_property(TEST CppMex PROPERTY DISABLED $<OR:$<NOT:$<TARGET_EXISTS:arrayProduct>>,$<VERSION_LESS:${Matlab_VERSION},24.2>>)
 
 
 # --- Fortran Mex called from Matlab
@@ -73,10 +71,9 @@ set(fortran_matsq_dir $<TARGET_FILE_DIR:matsq>)
 endif()
 
 add_test(NAME FortranMex
-COMMAND ${Matlab_MAIN_PROGRAM} -sd ${PROJECT_SOURCE_DIR}
-  -batch "buildtool test('${CMAKE_CURRENT_SOURCE_DIR}', 'TestMex/test_fortran_mex', '${fortran_matsq_dir}')"
+COMMAND ${Matlab_MAIN_PROGRAM} -sd ${PROJECT_SOURCE_DIR} -batch "buildtool test:mex:fortran"
 )
-set_property(TEST FortranMex PROPERTY DISABLED $<NOT:$<AND:$<BOOL:${matsq_src}>,$<BOOL:${Matlab_mex_Fortran}>>>)
+set_property(TEST FortranMex PROPERTY DISABLED $<OR:$<NOT:$<TARGET_EXISTS:matsq>>,$<VERSION_LESS:${Matlab_VERSION},24.2>>)
 
 
 # --- properties
