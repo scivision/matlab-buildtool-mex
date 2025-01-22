@@ -3,7 +3,7 @@ include(CheckSourceCompiles)
 
 # set(CMAKE_EXECUTE_PROCESS_COMMAND_ECHO STDOUT)
 
-set(CMAKE_CXX_STANDARD 11)
+# let default C++ version -- Matlab sets it recent enough.
 
 add_compile_definitions($<$<AND:$<BOOL:${MSVC}>,$<COMPILE_LANGUAGE:C,CXX>>:_CRT_SECURE_NO_WARNINGS>)
 
