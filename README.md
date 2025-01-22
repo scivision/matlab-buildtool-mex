@@ -1,9 +1,11 @@
-# Matlab CMake MEX
+# Matlab build system
 
 [![matlab](https://github.com/scivision/matlab-cmake-mex/actions/workflows/ci.yml/badge.svg)](https://github.com/scivision/matlab-cmake-mex/actions/workflows/ci.yml)
 
-Examples of Matlab MEX and Matlab Engine via CMake using
+Examples of building Matlab MEX and Matlab Engine targets using
 [Matlab supported compilers](https://www.mathworks.com/support/requirements/supported-compilers.html).
+This project started with the purpose of demonstrating CMake with MEX and Matlab Engine.
+Since R2023b, Matlab's own build system has become quite capable and is recommended over CMake for new projects.
 
 One-time setup from Matlab:
 
@@ -16,16 +18,39 @@ mex -setup -client engine c++
 mex -setup -client engine fortran
 ```
 
-Build:
+## Matlab MEX
+
+Using Matlab's own build system to build and test MEX examples from the Matlab Command Window:
+
+```matlab
+buildtool mex
+
+buildtool test:mex
+```
+
+## Matlab Engine
+
+Matlab Engine is available from several languages including C, C++, Fortran, Python, ...
+For compiled Matlab Engine programs, the appropriate "matlab" executable must be in environment variable PATH.
+
+```matlab
+buildtool engine
+
+buildtool test:engine
+```
+
+## CMake
+
+CMake may be used to build and test MEX and Matlab Engine examples:
 
 ```sh
 cmake -B build
 cmake --build build
 
-ctest --test-dir build
-```
+ctest --test-dir build -L mex -V
 
-## MEX
+ctest --test-dir build -L engine -V
+```
 
 Currently, there is a
 [known CMake bug](https://gitlab.kitware.com/cmake/cmake/-/issues/25068)
@@ -35,11 +60,6 @@ This happens on any operating system or Fortran compiler due to the issue with C
 ```
 Invalid MEX-file 'matsq.mexa64': Gateway function is missing
 ```
-
-## Matlab Engine
-
-Matlab Engine is available from several languages including C, C++, Fortran, Python, ...
-Note that even for compiled Matlab Engine programs, the appropriate "matlab" executable must be in environment variable PATH.
 
 ## Linux: compiler and libstdc++ compatibility
 
@@ -51,19 +71,11 @@ This is because compiler-switching mechanisms like RHEL Developer Toolset still
 [use system libstdc++](https://stackoverflow.com/a/69146673)
 that lack newer GLIBCXX symbols.
 
-* R2022a-R2023a: Linux: GCC 10
-* R2020b-R2021b: Linux: GCC 8
+* R2022a .. R2024b: Linux: GCC 10
+* R2020b .. R2021b: Linux: GCC 8
 
 A frequent issue on Linux systems is failure to link with libstdc++.so.6 correctly.
-Depending on the particular Matlab version and system libstdc++, one of the following techniques may help.
-
-Removing Matlab libstdc++:
-
-```sh
-mv <matlab_root>/sys/os/glnxa64/libstdc++.so.6 <matlab_root>/sys/os/glnxa64/libstdc++.so.6.bak
-```
-
-Putting Matlab libstdc++ first in LD_LIBRARY_PATH:
+Depending on the particular Matlab version and system libstdc++, putting Matlab libstdc++ first in LD_LIBRARY_PATH may help:
 
 ```sh
 LD_LIBRARY_PATH=<matlab_root>/sys/os/glnxa64/ cmake -Bbuild
@@ -75,9 +87,9 @@ with the particular Linux operating system vendor and version.
 
 ## Apple Silicon
 
-macOS users with Apple Silicon CPU (M1, M2, ....) are recommended to use the native Apple Silicon Matlab.
+macOS users with Apple Silicon CPU (M1, M2, ....) are required to use the native Apple Silicon Matlab.
 Better performance for Matlab comes by using the native CPU version of Matlab matching the computer CPU.
-However, if using Intel x86 Matlab on Apple Silicon CPU:
+However, while unsupported, if using Intel x86 Matlab on Apple Silicon CPU:
 
 ```sh
 cmake -B build -DCMAKE_OSX_ARCHITECTURES=x86_64
