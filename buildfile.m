@@ -72,7 +72,8 @@ for i = 1:size(engs, 1)
   if ispc, exe = exe + ".exe"; end
   plan(eng_name).Outputs = exe;
 
-  %plan("test:" + name) =
+  plan("test:engine:" + name) = matlab.buildtool.Task(...
+      Actions=@(context) subprocess_run(context, exe));
 end
 
 end
@@ -81,4 +82,33 @@ end
 function mex_engine(~, src, bindir, flags)
 flags(~strlength(flags)) = [];
 mex("-client", "engine", src, "-outdir", bindir, flags)
+end
+
+
+function subprocess_run(~, exe)
+
+matlab_bin = fullfile(matlabroot, "bin");
+mustBeFolder(matlab_bin)
+
+matlab_extern_bin = fullfile(matlabroot, "extern/bin", computer("arch"));
+mustBeFolder(matlab_extern_bin)
+
+matlab_arch_bin = fullfile(matlab_bin, computer("arch"));
+mustBeFolder(matlab_arch_bin)
+
+envs = struct();
+if ismac
+  envs = struct(DYLD_LIBRARY_PATH=matlab_arch_bin, PATH=matlab_bin);
+elseif isunix
+  linux_sys = fullfile(matlabroot, "sys/os", computer("arch"));
+  envs = struct(LD_LIBRARY_PATH=matlab_arch_bin + pathsep + matlab_extern_bin + pathsep + linux_sys, ...
+                PATH=matlab_bin);
+elseif ispc
+  envs = struct(PATH=matlab_arch_bin + pathsep + matlab_extern_bin + pathsep + matlab_bin);
+end
+env = namedargs2cell(envs);
+
+[stat, msg] = system(exe, env{:});
+
+assert(stat == 0, msg)
 end
