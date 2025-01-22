@@ -96,15 +96,20 @@ mustBeFolder(matlab_extern_bin)
 matlab_arch_bin = fullfile(matlab_bin, computer("arch"));
 mustBeFolder(matlab_arch_bin)
 
+newpath = matlab_bin + pathsep + getenv("PATH");
+
 envs = struct();
 if ismac
-  envs = struct(DYLD_LIBRARY_PATH=matlab_arch_bin, PATH=matlab_bin);
+  envs = struct(DYLD_LIBRARY_PATH=matlab_arch_bin, ...
+                PATH=newpath);
 elseif isunix
   linux_sys = fullfile(matlabroot, "sys/os", computer("arch"));
-  envs = struct(LD_LIBRARY_PATH=matlab_arch_bin + pathsep + matlab_extern_bin + pathsep + linux_sys, ...
-                PATH=matlab_bin);
+
+  envs = struct(...
+      LD_LIBRARY_PATH=matlab_arch_bin + pathsep + matlab_extern_bin + pathsep + linux_sys, ...
+      PATH=newpath);
 elseif ispc
-  envs = struct(PATH=matlab_arch_bin + pathsep + matlab_extern_bin + pathsep + matlab_bin);
+  envs = struct(PATH=matlab_arch_bin + pathsep + matlab_extern_bin + pathsep + newpath);
 end
 env = namedargs2cell(envs);
 
