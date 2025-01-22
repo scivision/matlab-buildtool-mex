@@ -1,56 +1,73 @@
 function plan = buildfile
-plan = buildplan(localfunctions);
+assert(~isMATLABReleaseOlderThan("R2023b"))
+
+plan = buildplan();
+
 plan.DefaultTasks = "test";
-plan("test").Dependencies = "check";
-end
 
-function checkTask(~)
-% Identify code issues (recursively all Matlab .m files)
-issues = codeIssues;
-assert(isempty(issues.Issues),formattedDisplayText(issues.Issues))
-end
+bindir = fullfile(tempdir, "build-mex-engine-" + matlabRelease().Release);
+if ~isfolder(bindir), mkdir(bindir); end
 
-function compileTask(context)
-rootFolder = context.Plan.RootFolder;
-out_dir = tempdir;
+plan("check") = matlab.buildtool.tasks.CodeIssuesTask(".", IncludeSubfolders=true, ...
+    WarningThreshold=0);
+    % Results="code-issues.sarif");
 
+addpath(bindir)
+
+plan("test") = matlab.buildtool.tasks.TestTask(...
+    fullfile(plan.RootFolder, "mex"), Strict=false);
+
+plan("clean") = matlab.buildtool.tasks.CleanTask;
+
+if isMATLABReleaseOlderThan("R2024b"), return, end
+%% MexTask
 example_dir = fullfile(matlabroot, "extern/examples");
 
-mex(fullfile(example_dir, "refbook/matrixMultiply.c"), "-outdir", out_dir, "-lmwblas")
-mex(fullfile(example_dir, "cpp_mex/arrayProduct.cpp"), "-outdir", out_dir)
+mexs = [...
+fullfile(example_dir, "refbook/matrixMultiply.c"), "-lmwblas"; ...
+fullfile(example_dir, "cpp_mex/arrayProduct.cpp"), ""; ...
+];
 
-mex("-client", "engine", fullfile(rootFolder, "engine/engdemo.c"), "-outdir", out_dir)
-mex("-client", "engine", fullfile(rootFolder, "engine/eng_demo.cpp"), "-outdir", out_dir)
+
+for i = 1:size(mexs, 1)
+  src = mexs(i, 1);
+  [~, name] = fileparts(src);
+
+  plan("mex:" + name) = matlab.buildtool.tasks.MexTask(src, bindir, Options=mexs(i, 2));
+end
+%% engineTask
+
+engs = [...
+fullfile(plan.RootFolder, "engine/Cengine.c"), ""; ...
+fullfile(plan.RootFolder, "engine/CppEngine.cpp"), ""; ...
+];
 
 fc = mex.getCompilerConfigurations('fortran');
-if isempty(fc)
-  warning("Fortran MEX compiler not available")
-  return
+if ~isempty(fc)
+  engs(end+1,:) = [fullfile(plan.RootFolder, "engine/eng_demo.F90"), ""];
 end
 
-mex("-client", "engine", fullfile(rootFolder, "engine/eng_demo.F90"), ...
-"-outdir", out_dir)
+for i = 1:size(engs, 1)
+  src = engs(i, 1);
+  [~, name] = fileparts(src);
+  eng_name = "engine:" + name;
+
+  plan(eng_name) = matlab.buildtool.Task(...
+      Actions=@(context) mex_engine(context, src, bindir, engs(i, 2)));
+  % allow incremental builds
+  plan(eng_name).Inputs = src;
+  plan(eng_name).Outputs = fullfile(bindir, name);
+
+  %plan("test:" + name) =
+end
 
 end
 
-function testTask(~, test_dir, test_name, bin_dir)
-arguments
-  ~
-  test_dir (1,1) string = "mex/"
-  test_name (1,1) string = "*"
-  bin_dir string {mustBeScalarOrEmpty} = tempdir;
-end
 
-  addpath(bin_dir)
+% function legacy_mex(context, src, flags, bindir)
+% mex(src, "-outdir", bindir, flags{:});
+% end
 
-  r = runtests(test_dir, Name=test_name);
-
-  assert(~isempty(r), 'No tests were run.')
-
-  if sum([r.Incomplete]) ~= 0
-      warning("Some tests were skipped.")
-      exit(77)
-  end
-
-  assertSuccess(r)
+function mex_engine(~, src, bindir, flags)
+mex("-client", "engine", src, "-outdir", bindir, flags, "-v")
 end
