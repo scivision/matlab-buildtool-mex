@@ -39,6 +39,22 @@ buildtool engine
 buildtool test:engine
 ```
 
+The Matlab Engine examples might be shaky on certain systems and configurations.
+Try running each example individually to see if any work.
+List tasks by:
+
+```matlab
+buildtool -tasks all
+```
+
+Examples of running individual tests:
+
+```matlab
+buildtool test:engine:Cengine
+buildtool test:engine:CppEngine
+buildtool test:engine:FortranEngine
+```
+
 ## CMake
 
 CMake may be used to build and test MEX and Matlab Engine examples:
