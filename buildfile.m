@@ -12,21 +12,30 @@ plan("check") = matlab.buildtool.tasks.CodeIssuesTask(".", IncludeSubfolders=tru
     WarningThreshold=0);
     % Results="code-issues.sarif");
 
+fc = mex.getCompilerConfigurations('fortran');
+
 addpath(bindir, plan.RootFolder + "/mex")
 
 plan("test:mex:blas") = matlab.buildtool.tasks.TestTask("TestMex/test_blas");
 plan("test:mex:array") = matlab.buildtool.tasks.TestTask("TestMex/test_cpp_array");
+if ~isempty(fc)
 plan("test:mex:fortran") = matlab.buildtool.tasks.TestTask("TestMex/test_fortran_mex");
+end
 
 plan("clean") = matlab.buildtool.tasks.CleanTask;
 
 %% MexTask
 example_dir = fullfile(matlabroot, "extern/examples");
+refbook = fullfile(example_dir, "refbook");
 
 mexs = [...
-fullfile(example_dir, "refbook/matrixMultiply.c"), "-lmwblas"; ...
+fullfile(refbook, "matrixMultiply.c"), "-lmwblas"; ...
 fullfile(example_dir, "cpp_mex/arrayProduct.cpp"), ""; ...
 ];
+
+if ~isempty(fc)
+  mexs(end+1,:) = [fullfile(refbook, "matsq.F"), ""];
+end
 
 complex_api = "-R2018a";
 % required "newer" interleaved interface, until it becomes default
@@ -45,7 +54,6 @@ fullfile(plan.RootFolder, "engine/Cengine.c"), ""; ...
 fullfile(plan.RootFolder, "engine/CppEngine.cpp"), ""; ...
 ];
 
-fc = mex.getCompilerConfigurations('fortran');
 if ~isempty(fc)
   engs(end+1,:) = [fullfile(plan.RootFolder, "engine/eng_demo.F90"), ""];
 end
