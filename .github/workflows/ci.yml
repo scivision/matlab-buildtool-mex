@@ -40,7 +40,7 @@ jobs:
 
     - uses: actions/checkout@v4
 
-    - name: CMake Linux config
+    - name: CMake configure on Linux
       if: runner.os == 'Linux'
       run: cmake -Bbuild -Dfortran=yes
       env:
@@ -48,17 +48,22 @@ jobs:
         CXX: g++-10
         FC: gfortran-10
 
-    - name: CMake macOS
+    - name: CMake configure on macOS
       if: runner.os == 'macOS'
       run: cmake -Bbuild -Dfortran=no
 
-    - name: Build
+    - name: CMake build
       run: cmake --build build
 
-    #   it appears GitHub Actions license doesn't support running Mex executables
-    # - name: Test
-    #   run: ctest --test-dir build -LE engine -V
+# MEX with CMake on GitHub runners gives
+# Licensing error: -1,359. System Error: 2
+# works with buildtool job.
+    # - name: CMake Test MEX
+    #   run: ctest --test-dir build -L mex -V
 
+# Matlab Engine doesn't work on GitHub runners
+    # - name: CMake Test Matlab Engine
+    #   run: ctest --test-dir build -L engine -V
 
   buildtool:
     strategy:
@@ -104,11 +109,13 @@ jobs:
       with:
         tasks: engine
 
-    - name: Test
+    - name: Test MEX
       uses: matlab-actions/run-build@v2
       with:
-        tasks: test
+        tasks: test:mex
 
-# it appears GitHub Actions license doesn't support running Mex executables
-    # - name: Test
-    #   run: ctest --test-dir build -C Release -LE engine -V
+# Matlab Engine doesn't work on GitHub runners
+    # - name: Test Matlab Engine
+    #   uses: matlab-actions/run-build@v2
+    #   with:
+    #     tasks: test:engine
