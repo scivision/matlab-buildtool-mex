@@ -18,6 +18,7 @@ jobs:
 
   cmake:
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-22.04]
         matlab: [R2023b, latest]
@@ -61,6 +62,7 @@ jobs:
 
   buildtool:
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-22.04, macos-latest, windows-latest]
         matlab: [latest]
