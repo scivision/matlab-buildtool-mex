@@ -4,10 +4,10 @@ set_property(DIRECTORY PROPERTY LABELS "engine")
 
 if(Matlab_engine_C)
 
-add_executable(engine_c engdemo.c)
+add_executable(engine_c Cengine.c)
 target_link_libraries(engine_c PRIVATE Matlab::eng)
 
-# matlab_add_mex(NAME engine_c EXECUTABLE SRC engdemo.c LINK_TO ${Matlab_LIBRARIES})
+# matlab_add_mex(NAME engine_c EXECUTABLE SRC Cengine.c LINK_TO ${Matlab_LIBRARIES})
 
 add_test(NAME Engine_C COMMAND engine_c)
 
@@ -17,13 +17,13 @@ endif(Matlab_engine_C)
 
 if(Matlab_engine_CXX)
 
-add_executable(engine_cpp eng_demo.cpp)
+add_executable(engine_cpp CppEngine.cpp)
 target_link_libraries(engine_cpp PRIVATE Matlab::MatlabEngine Matlab::MatlabDataArray ${CMAKE_THREAD_LIBS_INIT})
 
-# matlab_add_mex(NAME engine_cpp EXECUTABLE SRC eng_demo.cpp LINK_TO ${Matlab_LIBRARIES})
+# matlab_add_mex(NAME engine_cpp EXECUTABLE SRC CppEngine.cpp LINK_TO ${Matlab_LIBRARIES})
 
 # add_custom_target(engine_cpp ALL
-# COMMAND ${Matlab_MEX_COMPILER} -client engine ${CMAKE_CURRENT_SOURCE_DIR}/eng_demo.cpp
+# COMMAND ${Matlab_MEX_COMPILER} -client engine ${CMAKE_CURRENT_SOURCE_DIR}/CppEngine.cpp
 # BYPRODUCTS engine_cpp${CMAKE_EXECUTABLE_SUFFIX}
 # )
 

@@ -6,6 +6,9 @@
 #include <iostream>
 #include <cstdlib>
 
+#include <memory>
+#include <vector>
+
 void diagnose(void)
 {
     const char* envVars[] = { "LD_LIBRARY_PATH", "DYLD_LIBRARY_PATH", "PATH" };
@@ -17,18 +20,18 @@ void diagnose(void)
 }
 
 int main() {
-    using namespace matlab::engine;
 
     diagnose();
 
-    //save startup time
-    std::vector<String> optionVec;
+    //save startup time for Matlab < R2025a
+    std::vector<matlab::engine::String> optionVec;
     optionVec.push_back(u"-nojvm");
 
-    // Start MATLAB engine synchronously
-    std::unique_ptr<MATLABEngine> matlabPtr = startMATLAB(optionVec);
+    std::cout << "Start MATLAB engine synchronously" << std::endl;
+    std::unique_ptr<matlab::engine::MATLABEngine> matlabPtr =
+        matlab::engine::startMATLAB(optionVec);
 
-    //Create MATLAB data array factory
+    std::cout << "Create MATLAB data array factory" << std::endl;
     // https://www.mathworks.com/help/matlab/matlab-data-array.html
     matlab::data::ArrayFactory factory;
 
