@@ -18,6 +18,10 @@ endif(Matlab_engine_C)
 if(Matlab_engine_CXX)
 
 add_executable(engine_cpp CppEngine.cpp)
+if(APPLE)
+  message(VERBOSE "macOS engine workaround to avoid header include failure with R2024b")
+  target_compile_features(engine_cpp PRIVATE cxx_std_11)
+endif()
 target_link_libraries(engine_cpp PRIVATE Matlab::MatlabEngine Matlab::MatlabDataArray ${CMAKE_THREAD_LIBS_INIT})
 
 # matlab_add_mex(NAME engine_cpp EXECUTABLE SRC CppEngine.cpp LINK_TO ${Matlab_LIBRARIES})

@@ -40,6 +40,10 @@ if(array_src AND Matlab_mex_CXX)
 message(STATUS "C++ mex source file: ${array_src}")
 
 matlab_add_mex(NAME arrayProduct SHARED SRC ${array_src})
+if(APPLE)
+  message(VERBOSE "macOS MEX workaround to avoid header include failure with R2024b")
+  target_compile_features(arrayProduct PRIVATE cxx_std_11)
+endif()
 
 set(cxx_mex_dir $<TARGET_FILE_DIR:arrayProduct>)
 
