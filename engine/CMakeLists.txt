@@ -31,15 +31,15 @@ target_link_libraries(engine_cpp PRIVATE Matlab::MatlabEngine Matlab::MatlabData
 # BYPRODUCTS engine_cpp${CMAKE_EXECUTABLE_SUFFIX}
 # )
 
-add_test(NAME Engine_CPP COMMAND engine_cpp)
-set_property(TEST Engine_CPP PROPERTY SKIP_REGULAR_EXPRESSION "libstdc;GLIBCXX")
+add_test(NAME engine_cpp COMMAND engine_cpp)
+set_property(TEST engine_cpp PROPERTY SKIP_REGULAR_EXPRESSION "libstdc;GLIBCXX")
 
 endif(Matlab_engine_CXX)
 
 # --- Fortran calling Matlab Engine
 
 if(Matlab_engine_Fortran)
-  add_executable(engine_fortran eng_demo.F90)
+  add_executable(engine_fortran FortranEngine.F90)
   target_link_libraries(engine_fortran PRIVATE Matlab::eng)
 
   add_test(NAME Engine_Fortran COMMAND engine_fortran)

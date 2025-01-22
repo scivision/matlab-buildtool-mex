@@ -55,7 +55,7 @@ fullfile(plan.RootFolder, "engine/CppEngine.cpp"), ""; ...
 ];
 
 if ~isempty(fc)
-  engs(end+1,:) = [fullfile(plan.RootFolder, "engine/eng_demo.F90"), ""];
+  engs(end+1,:) = [fullfile(plan.RootFolder, "engine/FortranEngine.F90"), ""];
 end
 
 for i = 1:size(engs, 1)
