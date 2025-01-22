@@ -28,12 +28,15 @@ fullfile(example_dir, "refbook/matrixMultiply.c"), "-lmwblas"; ...
 fullfile(example_dir, "cpp_mex/arrayProduct.cpp"), ""; ...
 ];
 
+complex_api = "-R2018a";
+% required "newer" interleaved interface, until it becomes default
 
 for i = 1:size(mexs, 1)
   src = mexs(i, 1);
   [~, name] = fileparts(src);
 
-  plan("mex:" + name) = matlab.buildtool.tasks.MexTask(src, bindir, Options=mexs(i, 2));
+  plan("mex:" + name) = matlab.buildtool.tasks.MexTask(src, bindir, ...
+      Options=[complex_api, mexs(i, 2)]);
 end
 %% engineTask
 
@@ -53,7 +56,8 @@ for i = 1:size(engs, 1)
   eng_name = "engine:" + name;
 
   plan(eng_name) = matlab.buildtool.Task(...
-      Actions=@(context) mex_engine(context, src, bindir, engs(i, 2)));
+      Actions=@(context) mex_engine(context, src, bindir, ...
+      [complex_api, engs(i, 2)]));
   % allow incremental builds
   plan(eng_name).Inputs = src;
   exe = fullfile(bindir, name);
@@ -66,10 +70,7 @@ end
 end
 
 
-% function legacy_mex(context, src, flags, bindir)
-% mex(src, "-outdir", bindir, flags{:});
-% end
-
 function mex_engine(~, src, bindir, flags)
+flags(~strlength(flags)) = [];
 mex("-client", "engine", src, "-outdir", bindir, flags)
 end
