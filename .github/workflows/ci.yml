@@ -8,21 +8,26 @@ on:
     - "**/CMakeLists.txt"
     - ".github/workflows/ci.yml"
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 # Engine can't start on CI runner Linux, but works on real Linux computer
 
 jobs:
 
-  unix:
-
+  cmake:
     strategy:
       matrix:
-        os: [ubuntu-latest]
+        os: [ubuntu-22.04]
         matlab: [R2023b, latest]
         include:
         - os: macos-latest
           matlab: latest
 
     runs-on: ${{ matrix.os }}
+
+    timeout-minutes: 15
 
     steps:
 
@@ -54,13 +59,15 @@ jobs:
     #   run: ctest --test-dir build -LE engine -V
 
 
-  msvc:
+  buildtool:
     strategy:
       matrix:
+        os: [ubuntu-22.04, macos-latest, windows-latest]
         matlab: [latest]
-  # R2023b didn't work with MSVC on GitHub Actions in Sept 2023.
 
-    runs-on: windows-latest
+    runs-on: ${{ matrix.os }}
+
+    timeout-minutes: 15
 
     steps:
 
@@ -69,14 +76,36 @@ jobs:
       uses: matlab-actions/setup-matlab@v2
       with:
         release: ${{ matrix.matlab }}
+        cache: true
 
     - uses: actions/checkout@v4
 
-    - name: CMake workflow
-      run: cmake -Bbuild -Dfortran=no
+    - name: Check Matlab code
+      uses: matlab-actions/run-build@v2
+      with:
+        tasks: check
 
-    - name: Build
-      run: cmake --build build --config Release
+    - name: Linux GCC 10
+      if: runner.os == 'Linux'
+      run: |
+        echo "CC=gcc-10" >> $GITHUB_ENV
+        echo "CXX=g++-10" >> $GITHUB_ENV
+        echo "FC=gfortran-10" >> $GITHUB_ENV
+
+    - name: Build MEX
+      uses: matlab-actions/run-build@v2
+      with:
+        tasks: mex
+
+    - name: Build engine
+      uses: matlab-actions/run-build@v2
+      with:
+        tasks: engine
+
+    - name: Test
+      uses: matlab-actions/run-build@v2
+      with:
+        tasks: test
 
 # it appears GitHub Actions license doesn't support running Mex executables
     # - name: Test

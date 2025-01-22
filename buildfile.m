@@ -56,7 +56,9 @@ for i = 1:size(engs, 1)
       Actions=@(context) mex_engine(context, src, bindir, engs(i, 2)));
   % allow incremental builds
   plan(eng_name).Inputs = src;
-  plan(eng_name).Outputs = fullfile(bindir, name);
+  exe = fullfile(bindir, name);
+  if ispc, exe = exe + ".exe"; end
+  plan(eng_name).Outputs = exe;
 
   %plan("test:" + name) =
 end
@@ -69,5 +71,5 @@ end
 % end
 
 function mex_engine(~, src, bindir, flags)
-mex("-client", "engine", src, "-outdir", bindir, flags, "-v")
+mex("-client", "engine", src, "-outdir", bindir, flags)
 end
