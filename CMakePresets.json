@@ -40,7 +40,8 @@
     "noTestsAction": "error",
     "scheduleRandom": true,
     "stopOnFailure": false,
-    "timeout": 180
+    "timeout": 180,
+    "jobs": 0
   }
 },
 {

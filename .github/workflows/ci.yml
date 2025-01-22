@@ -1,10 +1,5 @@
 name: matlab
 
-env:
-  CTEST_NO_TESTS_ACTION: error
-  CMAKE_BUILD_PARALLEL_LEVEL: 4
-  CTEST_PARALLEL_LEVEL: 0
-
 on:
   push:
     paths:
@@ -22,10 +17,10 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        matlab: [R2023a, latest]
+        matlab: [R2023b, latest]
         include:
-          - os: macos-latest
-            matlab: latest
+        - os: macos-latest
+          matlab: latest
 
     runs-on: ${{ matrix.os }}
 
