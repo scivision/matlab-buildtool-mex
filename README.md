@@ -113,7 +113,7 @@ cmake -B build -DCMAKE_OSX_ARCHITECTURES=x86_64
 
 ## Compiler flags
 
-Matlab MEX compiler appears to ignore "FFLAGS" environment variable conventionally used for passing Fortran compiler flags.
+Matlab MEX compiler ignores environment variables like CFLAGS, CXXFLAGS, FFLAGS.
 This becomes an issue when needing "-fallow-invalid-boz" for GCC > 10.
 Newer Matlab versions pass this flag for every GFortran MEX.
 

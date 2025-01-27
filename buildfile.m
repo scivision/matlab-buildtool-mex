@@ -80,13 +80,20 @@ end
 
 
 function mex_engine(~, src, bindir, flags)
+% There isn't yet a MexEngineTask built-in, and passing "-client engine" as
+% MexTask options didn't work.
 flags(~strlength(flags)) = [];
 mex("-client", "engine", src, "-outdir", bindir, flags)
 end
 
 
 function subprocess_run(~, exe)
+arguments
+  ~
+  exe (1,1) string
+end
 
+% sets env vars DYLD_LIBRARY_PATH, LD_LIBRARY_PATH, PATH, etc.
 matlab_bin = fullfile(matlabroot, "bin");
 mustBeFolder(matlab_bin)
 
