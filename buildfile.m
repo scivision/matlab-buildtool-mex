@@ -13,6 +13,14 @@ plan("check") = matlab.buildtool.tasks.CodeIssuesTask(".", IncludeSubfolders=tru
     % Results="code-issues.sarif");
 
 fc = mex.getCompilerConfigurations('fortran');
+if ~isempty(fc) && fc.ShortName == "gfortran"
+  fcMajor = regexp(fc.Version, "^(\d+)\.?", "tokens");
+  if ~isempty(fcMajor)
+    if double(string(fcMajor{1}{1})) < 10
+      warning("GFortran 10 is recommended")
+    end
+  end
+end
 
 addpath(bindir, plan.RootFolder + "/mex")
 
