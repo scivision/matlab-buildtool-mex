@@ -47,6 +47,8 @@ for i = 1:size(mexs, 1)
   plan("mex:" + name) = matlab.buildtool.tasks.MexTask(src, bindir, ...
       Options=[complex_api, mexs(i, 2)]);
 end
+
+plan("test:mex").Dependencies = "mex";
 %% engineTask
 
 engs = [...
@@ -62,19 +64,19 @@ for i = 1:size(engs, 1)
   src = engs(i, 1);
   [~, name] = fileparts(src);
   eng_name = "engine:" + name;
-
-  plan(eng_name) = matlab.buildtool.Task(...
-      Actions=@(context) mex_engine(context, src, bindir, ...
-      [complex_api, engs(i, 2)]));
-  % allow incremental builds
-  plan(eng_name).Inputs = src;
   exe = fullfile(bindir, name);
   if ispc, exe = exe + ".exe"; end
-  plan(eng_name).Outputs = exe;
+
+  plan(eng_name) = matlab.buildtool.Task(Inputs=src, ...
+      Outputs=exe, ...
+      Actions=@(context) mex_engine(context, src, bindir, ...
+      [complex_api, engs(i, 2)]));
 
   plan("test:engine:" + name) = matlab.buildtool.Task(...
       Actions=@(context) subprocess_run(context, exe));
 end
+
+plan("test:engine").Dependencies = "engine";
 
 end
 
@@ -88,10 +90,6 @@ end
 
 
 function subprocess_run(~, exe)
-arguments
-  ~
-  exe (1,1) string
-end
 
 % sets env vars DYLD_LIBRARY_PATH, LD_LIBRARY_PATH, PATH, etc.
 matlab_bin = fullfile(matlabroot, "bin");

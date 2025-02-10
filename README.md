@@ -1,10 +1,9 @@
-# Matlab build system
+# Matlab build system with MEX and Matlab Engine
 
 [![matlab](https://github.com/scivision/matlab-cmake-mex/actions/workflows/ci.yml/badge.svg)](https://github.com/scivision/matlab-cmake-mex/actions/workflows/ci.yml)
 
 Examples of building Matlab MEX and Matlab Engine targets using
 [Matlab supported compilers](https://www.mathworks.com/support/requirements/supported-compilers.html).
-This project started with the purpose of demonstrating CMake with MEX and Matlab Engine.
 Since R2023b, Matlab's own build system has become quite capable and is recommended over CMake for new projects.
 
 One-time setup from Matlab:
@@ -23,8 +22,6 @@ mex -setup -client engine fortran
 Using Matlab's own build system to build and test MEX examples from the Matlab Command Window:
 
 ```matlab
-buildtool mex
-
 buildtool test:mex
 ```
 
@@ -34,8 +31,6 @@ Matlab Engine is available from several languages including C, C++, Fortran, Pyt
 For compiled Matlab Engine programs, the appropriate "matlab" executable must be in environment variable PATH.
 
 ```matlab
-buildtool engine
-
 buildtool test:engine
 ```
 
@@ -101,23 +96,9 @@ It may be necessary to try different Matlab versions to find one
 [Linux compatible](https://www.mathworks.com/support/requirements/matlab-linux.html)
 with the particular Linux operating system vendor and version.
 
-## Apple Silicon
-
-macOS users with Apple Silicon CPU (M1, M2, ....) are required to use the native Apple Silicon Matlab.
-Better performance for Matlab comes by using the native CPU version of Matlab matching the computer CPU.
-However, while unsupported, if using Intel x86 Matlab on Apple Silicon CPU:
-
-```sh
-cmake -B build -DCMAKE_OSX_ARCHITECTURES=x86_64
-```
-
-## Compiler flags
+## Reference
 
 Matlab MEX compiler ignores environment variables like CFLAGS, CXXFLAGS, FFLAGS.
-This becomes an issue when needing "-fallow-invalid-boz" for GCC > 10.
-Newer Matlab versions pass this flag for every GFortran MEX.
-
-## Reference
 
 * [C Engine](https://www.mathworks.com/help/matlab/calling-matlab-engine-from-c-programs-1.html)
 * [C++ Engine](https://www.mathworks.com/help/matlab/calling-matlab-engine-from-cpp-programs.html)
