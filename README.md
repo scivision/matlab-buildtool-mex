@@ -45,9 +45,9 @@ buildtool -tasks all
 Examples of running individual tests:
 
 ```matlab
-buildtool test:engine:Cengine
-buildtool test:engine:CppEngine
-buildtool test:engine:FortranEngine
+buildtool test:engine:c
+buildtool test:engine:cpp
+buildtool test:engine:fortran
 ```
 
 ## CMake

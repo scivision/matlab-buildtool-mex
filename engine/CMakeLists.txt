@@ -4,10 +4,10 @@ set_property(DIRECTORY PROPERTY LABELS "engine")
 
 if(Matlab_engine_C)
 
-add_executable(engine_c Cengine.c)
+add_executable(engine_c c.c)
 target_link_libraries(engine_c PRIVATE Matlab::eng)
 
-# matlab_add_mex(NAME engine_c EXECUTABLE SRC Cengine.c LINK_TO ${Matlab_LIBRARIES})
+# matlab_add_mex(NAME engine_c EXECUTABLE SRC c.c LINK_TO ${Matlab_LIBRARIES})
 
 add_test(NAME Engine_C COMMAND engine_c)
 
@@ -17,17 +17,17 @@ endif(Matlab_engine_C)
 
 if(Matlab_engine_CXX)
 
-add_executable(engine_cpp CppEngine.cpp)
+add_executable(engine_cpp cpp.cpp)
 if(APPLE)
   message(VERBOSE "macOS engine workaround to avoid header include failure with R2024b")
   target_compile_features(engine_cpp PRIVATE cxx_std_11)
 endif()
 target_link_libraries(engine_cpp PRIVATE Matlab::MatlabEngine Matlab::MatlabDataArray ${CMAKE_THREAD_LIBS_INIT})
 
-# matlab_add_mex(NAME engine_cpp EXECUTABLE SRC CppEngine.cpp LINK_TO ${Matlab_LIBRARIES})
+# matlab_add_mex(NAME engine_cpp EXECUTABLE SRC cpp.cpp LINK_TO ${Matlab_LIBRARIES})
 
 # add_custom_target(engine_cpp ALL
-# COMMAND ${Matlab_MEX_COMPILER} -client engine ${CMAKE_CURRENT_SOURCE_DIR}/CppEngine.cpp
+# COMMAND ${Matlab_MEX_COMPILER} -client engine ${CMAKE_CURRENT_SOURCE_DIR}/cpp.cpp
 # BYPRODUCTS engine_cpp${CMAKE_EXECUTABLE_SUFFIX}
 # )
 
@@ -39,7 +39,7 @@ endif(Matlab_engine_CXX)
 # --- Fortran calling Matlab Engine
 
 if(Matlab_engine_Fortran)
-  add_executable(engine_fortran FortranEngine.F90)
+  add_executable(engine_fortran fortran.F90)
   target_link_libraries(engine_fortran PRIVATE Matlab::eng)
 
   add_test(NAME Engine_Fortran COMMAND engine_fortran)
