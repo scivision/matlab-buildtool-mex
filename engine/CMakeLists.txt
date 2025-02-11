@@ -23,7 +23,6 @@ elseif(_method STREQUAL "wrap")
 
   add_custom_command(OUTPUT ${exe}
   COMMAND ${Matlab_MEX_COMPILER} -client engine ${src} -output ${exe}
-  DEPENDS ${src}
   VERBATIM
   )
 
@@ -56,15 +55,12 @@ elseif(_method STREQUAL "wrap")
   set(src ${CMAKE_CURRENT_SOURCE_DIR}/cpp.cpp)
   set(exe ${CMAKE_CURRENT_BINARY_DIR}/engineCpp${CMAKE_EXECUTABLE_SUFFIX})
 
-  add_custom_command(
-    OUTPUT ${exe}
+  add_custom_command(OUTPUT ${exe}
     COMMAND ${Matlab_MEX_COMPILER} -client engine ${src} -output ${exe}
-    DEPENDS ${src}
     VERBATIM
   )
 
-# Create an ALIAS TARGET
-add_custom_target(engine_cpp ALL DEPENDS ${exe})
+  add_custom_target(engine_cpp ALL DEPENDS ${exe})
 
 endif()
 
@@ -74,11 +70,31 @@ matlab_libpath(EngineCpp)
 
 # --- Fortran calling Matlab Engine
 
-if(Matlab_engine_Fortran)
+if(Matlab_mex_Fortran)
+
+if(_method STREQUAL "cmake")
   add_executable(engine_fortran fortran.F90)
   target_link_libraries(engine_fortran PRIVATE Matlab::eng)
+  set(exe $<TARGET_FILE:engine_fortran>)
+elseif(_method STREQUAL "find")
 
-  add_test(NAME EngineFortran COMMAND engine_fortran)
+  matlab_add_mex(NAME engine_fortran EXECUTABLE SRC fortran.F90 LINK_TO ${Matlab_LIBRARIES})
+  set(exe $<TARGET_FILE:engine_fortran>)
+
+elseif(_method STREQUAL "wrap")
+
+  set(src ${CMAKE_CURRENT_SOURCE_DIR}/fortran.F90)
+  set(exe ${CMAKE_CURRENT_BINARY_DIR}/engineFortran${CMAKE_EXECUTABLE_SUFFIX})
+
+  add_custom_command(OUTPUT ${exe}
+    COMMAND ${Matlab_MEX_COMPILER} -client engine ${src} -output ${exe}
+    VERBATIM
+  )
+
+  add_custom_target(engine_fortran ALL DEPENDS ${exe})
+endif()
+
+  add_test(NAME EngineFortran COMMAND ${exe})
   matlab_libpath(EngineFortran)
 endif()
 

@@ -21,7 +21,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-22.04]
-        matlab: [R2023b, latest]
+        matlab: [latest]
         include:
         - os: macos-latest
           matlab: latest

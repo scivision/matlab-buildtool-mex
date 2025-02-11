@@ -7,15 +7,9 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
   cmake --build build")
 endif()
 
-project(MatlabMEX LANGUAGES C CXX)
+project(MatlabMEX LANGUAGES NONE)
 
 enable_testing()
-
-option(fortran "use fortran language too" on)
-
-if(fortran)
-  enable_language(Fortran)
-endif()
 
 message(STATUS "CMake ${CMAKE_VERSION}")
 
@@ -23,7 +17,7 @@ message(STATUS "CMake ${CMAKE_VERSION}")
 
 file(GENERATE OUTPUT .gitignore CONTENT "*")
 
-find_package(Matlab COMPONENTS MAIN_PROGRAM ENG_LIBRARY MAT_LIBRARY MX_LIBRARY MEX_COMPILER REQUIRED)
+find_package(Matlab COMPONENTS MAIN_PROGRAM MEX_COMPILER REQUIRED) # ENG_LIBRARY MAT_LIBRARY MX_LIBRARY
 
 if(CMAKE_VERSION VERSION_LESS 3.27)
   set(Matlab_VERSION ${Matlab_VERSION_STRING})
@@ -48,7 +42,6 @@ add_subdirectory(engine)
 
 include(FeatureSummary)
 
-add_feature_info(Matlab_engine_Fortran Matlab_engine_Fortran "Matlab Fortran Engine")
 add_feature_info(Matlab_mex_Fortran Matlab_mex_Fortran "Matlab Fortran MEX")
 
 

@@ -17,7 +17,7 @@ endif()
 # GCC gives the warning but doesn't have a way to disable the warning.
 
 
-find_package(Threads)
+#find_package(Threads)
 
 function(find_mex_libs)
 # MEX BLAS may need to be linked for targets using BLAS
@@ -98,8 +98,8 @@ endif()
 endfunction(check_mex)
 
 
-set(CMAKE_REQUIRED_LIBRARIES ${Matlab_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
-set(CMAKE_REQUIRED_INCLUDES ${Matlab_INCLUDE_DIRS})
+# set(CMAKE_REQUIRED_LIBRARIES ${Matlab_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+# set(CMAKE_REQUIRED_INCLUDES ${Matlab_INCLUDE_DIRS})
 
 # --- check C Engine
 # file(READ ${CMAKE_CURRENT_LIST_DIR}/engine.c _src)
@@ -131,12 +131,9 @@ set(CMAKE_REQUIRED_INCLUDES ${Matlab_INCLUDE_DIRS})
 # endif()
 
 # --- check Fortran engine
-if(NOT fortran)
-  return()
-endif()
 
-file(READ ${CMAKE_CURRENT_LIST_DIR}/engine.f90 _src)
-check_source_compiles(Fortran "${_src}" Matlab_engine_Fortran)
+# file(READ ${CMAKE_CURRENT_LIST_DIR}/engine.f90 _src)
+# check_source_compiles(Fortran "${_src}" Matlab_engine_Fortran)
 
 find_file(matsq_src
 NAMES matsq.F
