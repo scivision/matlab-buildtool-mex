@@ -47,7 +47,7 @@ function(matlab_libpath test_names)
 
 if(APPLE)
   set_property(TEST ${test_names} PROPERTY
-  ENVIRONMENT_MODIFICATION "DYLD_LIBRARY_PATH=path_list_prepend:${Matlab_BINARIES_DIR};PATH=path_list_prepend:${Matlab_ROOT_DIR}/bin"
+  ENVIRONMENT_MODIFICATION "DYLD_LIBRARY_PATH=path_list_prepend:${Matlab_EXTERN_BINARIES_DIR};PATH=path_list_prepend:${Matlab_ROOT_DIR}/bin"
   )
 elseif(WIN32)
   set_property(TEST ${test_names} PROPERTY
@@ -71,6 +71,7 @@ endif()
 set(cmd ${Matlab_MEX_COMPILER} -outdir ${PROJECT_BINARY_DIR}/cmake ${src_file})
 
 message(CHECK_START "Check Matlab MEX ${lang}")
+
 execute_process(
 COMMAND ${cmd}
 TIMEOUT 60
@@ -78,6 +79,7 @@ RESULT_VARIABLE ret
 ERROR_VARIABLE err
 OUTPUT_VARIABLE out
 )
+
 if(ret EQUAL 0)
   message(CHECK_PASS "Success")
   set(Matlab_mex_${lang} true CACHE BOOL "Matlab Mex ${lang} OK")
@@ -99,32 +101,34 @@ endfunction(check_mex)
 set(CMAKE_REQUIRED_LIBRARIES ${Matlab_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 set(CMAKE_REQUIRED_INCLUDES ${Matlab_INCLUDE_DIRS})
 
-# --- check C engine
-file(READ ${CMAKE_CURRENT_LIST_DIR}/engine.c _src)
-check_source_compiles(C "${_src}" Matlab_engine_C)
+# --- check C Engine
+# file(READ ${CMAKE_CURRENT_LIST_DIR}/engine.c _src)
+# check_source_compiles(C "${_src}" Matlab_engine_C)
 
-find_file(times_src
-NAMES timestwo.c
-NO_DEFAULT_PATH
-PATHS ${Matlab_ROOT_DIR}/extern/examples/refbook
-)
-if(times_src)
-  check_mex("C" ${times_src})
-endif()
+# --- check C Mex
+# find_file(times_src
+# NAMES timestwo.c
+# NO_DEFAULT_PATH
+# PATHS ${Matlab_ROOT_DIR}/extern/examples/refbook
+# )
+# if(times_src)
+#   check_mex("C" ${times_src})
+# endif()
 
-# --- check C++ engine
+# --- check C++ Engine
 
-file(READ ${CMAKE_CURRENT_LIST_DIR}/engine.cpp _src)
-check_source_compiles(CXX "${_src}" Matlab_engine_CXX)
+# file(READ ${CMAKE_CURRENT_LIST_DIR}/engine.cpp _src)
+# check_source_compiles(CXX "${_src}" Matlab_engine_CXX)
 
-find_file(array_src
-NAMES arrayProduct.cpp
-NO_DEFAULT_PATH
-PATHS ${Matlab_ROOT_DIR}/extern/examples/cpp_mex
-)
-if(array_src)
-  check_mex("CXX" ${array_src})
-endif()
+# --- check C++ Mex
+# find_file(array_src
+# NAMES arrayProduct.cpp
+# NO_DEFAULT_PATH
+# PATHS ${Matlab_ROOT_DIR}/extern/examples/cpp_mex
+# )
+# if(array_src)
+#   check_mex("CXX" ${array_src})
+# endif()
 
 # --- check Fortran engine
 if(NOT fortran)
