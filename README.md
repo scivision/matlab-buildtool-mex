@@ -1,6 +1,6 @@
 # Matlab build system with MEX and Matlab Engine
 
-[![matlab](https://github.com/scivision/matlab-cmake-mex/actions/workflows/ci.yml/badge.svg)](https://github.com/scivision/matlab-cmake-mex/actions/workflows/ci.yml)
+[![matlab](https://github.com/scivision/matlab-buildtool-mex/actions/workflows/ci.yml/badge.svg)](https://github.com/scivision/matlab-buildtool-mex/actions/workflows/ci.yml)
 
 Examples of building Matlab MEX and Matlab Engine targets using
 [Matlab supported compilers](https://www.mathworks.com/support/requirements/supported-compilers.html).
