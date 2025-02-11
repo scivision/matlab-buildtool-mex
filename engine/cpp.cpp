@@ -5,18 +5,34 @@
 
 #include <iostream>
 #include <cstdlib>
+#include <string>
 
 #include <memory>
 #include <vector>
 
 void diagnose(void)
 {
-    const char* envVars[] = { "LD_LIBRARY_PATH", "DYLD_LIBRARY_PATH", "PATH" };
-    for (auto& envVar : envVars) {
-        char* p = std::getenv(envVar);
-        if (p)
-            std::cout << envVar << ": " << p << "\n";
+    std::string reqEnv;
+#ifdef __APPLE__
+    reqEnv = "DYLD_LIBRARY_PATH";
+#elif defined(__linux__)
+    reqEnv = "LD_LIBRARY_PATH";
+#elif defined(_WIN32)
+    reqEnv = "PATH";
+#endif
+
+    auto r = std::getenv(reqEnv.data());
+    if (!r){
+      std::cout << reqEnv << " not set, run will fail, aborting...\n";
+      std::exit(77);
     }
+
+    std::cout << reqEnv << ": " << r << "\n";
+
+#ifndef _WIN32
+    r = std::getenv("PATH");
+    if (r) std::cout << "PATH: " << r << "\n";
+#endif
 }
 
 int main() {

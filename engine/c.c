@@ -18,35 +18,45 @@
 
 void diagnose(void)
 {
-	char* p = getenv("LD_LIBRARY_PATH");
-	if(p) printf("LD_LIBRARY_PATH: %s\n", p);
+const char* reqEnv =
+#ifdef __APPLE__
+   "DYLD_LIBRARY_PATH";
+#elif defined(__linux__)
+   "LD_LIBRARY_PATH";
+#elif defined(_WIN32)
+   "PATH";
+#endif
 
-	p = getenv("DYLD_LIBRARY_PATH");
-	if(p) printf("DYLD_LIBRARY_PATH: %s\n", p);
+  char* p = getenv(reqEnv);
+  if(!p) {
+	fprintf(stderr, "%s not set, run will fail, aborting...\n", reqEnv);
+	exit(77);
+  }
+  printf("%s: %s\n", reqEnv, p);
 
+#ifndef _WIN32
 	p = getenv("PATH");
 	if(p) printf("PATH: %s\n", p);
+#endif
 }
 
 int main(void)
 {
+
+diagnose();
+
 Engine *ep;
+
 mxArray *T = NULL;
 char buffer[BUFSIZE+1];
 double time[10] = { 0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0 };
 
-/*
-	* Call engOpen with a NULL string. This starts a MATLAB process
-		* on the current host using the command "matlab".
-	*/
+ep = engOpen(NULL);
 
-diagnose();
-
-if (!(ep = engOpen(NULL))) {
+if (!ep) {
   fprintf(stderr, "\nCan't start MATLAB engine\n");
   return EXIT_FAILURE;
 }
-
 
 printf("Matlab engine started\n");
 

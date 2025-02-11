@@ -48,11 +48,7 @@ add_subdirectory(engine)
 
 include(FeatureSummary)
 
-add_feature_info(Matlab_engine_C Matlab_engine_C "Matlab C Engine")
-add_feature_info(Matlab_engine_CXX Matlab_engine_CXX "Matlab C++ Engine")
 add_feature_info(Matlab_engine_Fortran Matlab_engine_Fortran "Matlab Fortran Engine")
-add_feature_info(Matlab_mex_C Matlab_mex_C "Matlab C MEX")
-add_feature_info(Matlab_mex_CXX Matlab_mex_CXX "Matlab C++ MEX")
 add_feature_info(Matlab_mex_Fortran Matlab_mex_Fortran "Matlab Fortran MEX")
 
 

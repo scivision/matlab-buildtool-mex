@@ -9,7 +9,7 @@ NO_DEFAULT_PATH
 PATHS ${Matlab_ROOT_DIR}/extern/examples/refbook
 )
 
-if(matmul_src AND Matlab_MEX_BLAS AND Matlab_mex_C)
+if(matmul_src AND Matlab_MEX_BLAS)
   # add_custom_target(matrixMultiply ALL
   # COMMAND ${Matlab_MEX_COMPILER} ${matmul_src} ${CMAKE_LIBRARY_PATH_FLAG}${Matlab_EXTERN_LIBRARY_DIR} ${Matlab_MEX_BLAS}
   # )
@@ -35,7 +35,7 @@ NO_DEFAULT_PATH
 PATHS ${Matlab_ROOT_DIR}/extern/examples/cpp_mex
 )
 
-if(array_src AND Matlab_mex_CXX)
+if(array_src)
 
 message(STATUS "C++ mex source file: ${array_src}")
 
