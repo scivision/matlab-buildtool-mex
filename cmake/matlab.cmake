@@ -68,7 +68,7 @@ if(DEFINED Matlab_mex_${lang})
   return()
 endif()
 
-set(cmd ${Matlab_MEX_COMPILER} -outdir ${PROJECT_BINARY_DIR}/cmake ${src_file})
+set(cmd ${Matlab_MEX_COMPILER} -R2018a -outdir ${PROJECT_BINARY_DIR}/cmake ${src_file})
 
 message(CHECK_START "Check Matlab MEX ${lang}")
 

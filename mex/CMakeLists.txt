@@ -18,7 +18,7 @@ if(matmul_src AND Matlab_MEX_BLAS)
 if(_method STREQUAL "wrap")
 
   add_custom_command(OUTPUT matrixMultiply.${Matlab_MEX_SUFFIX}
-  COMMAND ${Matlab_MEX_COMPILER} ${matmul_src} ${CMAKE_LIBRARY_PATH_FLAG}${Matlab_EXTERN_LIBRARY_DIR} ${Matlab_MEX_BLAS} -output matrixMultiply
+  COMMAND ${Matlab_MEX_COMPILER} -R2018a ${CMAKE_LIBRARY_PATH_FLAG}${Matlab_EXTERN_LIBRARY_DIR} ${Matlab_MEX_BLAS} ${matmul_src}
   VERBATIM
   )
 
@@ -48,7 +48,7 @@ if(array_src)
 if(_method STREQUAL "wrap")
 
   add_custom_command(OUTPUT arrayProduct.${Matlab_MEX_SUFFIX}
-  COMMAND ${Matlab_MEX_COMPILER} ${array_src} -output arrayProduct
+  COMMAND ${Matlab_MEX_COMPILER} -R2018a ${array_src}
   VERBATIM
   )
 
@@ -86,7 +86,7 @@ if(matsq_src AND Matlab_mex_Fortran)
 if(_method STREQUAL "wrap")
 
   add_custom_command(OUTPUT matsq.${Matlab_MEX_SUFFIX}
-  COMMAND ${Matlab_MEX_COMPILER} ${matsq_src} -output matsq
+  COMMAND ${Matlab_MEX_COMPILER} -R2018a ${matsq_src}
   VERBATIM
   )
 
