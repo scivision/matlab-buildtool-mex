@@ -27,6 +27,9 @@ Using Matlab's own build system to build and test MEX examples from the Matlab C
 buildtool test:mex
 ```
 
+The [buildfile.m](./buildfile.m) shows several techniques, including linking Matlab BLAS (see the matrixMultiply.c in buildfile.m).
+
+
 ## Matlab Engine
 
 Matlab Engine is available from several languages including C, C++, Fortran, Python, ...
