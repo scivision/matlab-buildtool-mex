@@ -17,6 +17,8 @@ mex -setup -client engine c++
 mex -setup -client engine fortran
 ```
 
+[Troubleshootings and more MEX setup help](https://www.scivision.dev/matlab-compiler-setup/)
+
 ## Matlab MEX
 
 Using Matlab's own build system to build and test MEX examples from the Matlab Command Window:
