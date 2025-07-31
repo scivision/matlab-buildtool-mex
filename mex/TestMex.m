@@ -1,5 +1,12 @@
 classdef TestMex < matlab.unittest.TestCase
 
+methods(TestClassSetup)
+function pkg_path(tc)
+p = matlab.unittest.fixtures.PathFixture(fileparts(mfilename('fullpath')));
+tc.applyFixture(p)
+end
+end
+
 methods(Test)
 
 function test_blas(tc)

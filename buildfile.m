@@ -5,28 +5,33 @@ plan = buildplan();
 
 plan.DefaultTasks = "test";
 
-bindir = fullfile(tempdir, "build-mex-engine-" + matlabRelease().Release);
-if ~isfolder(bindir), mkdir(bindir); end
+
+mexFolder = plan.RootFolder + "/mex";
+engFolder = plan.RootFolder + "/engine";
 
 plan("check") = matlab.buildtool.tasks.CodeIssuesTask(".", IncludeSubfolders=true, ...
     WarningThreshold=0);
     % Results="code-issues.sarif");
 
+fcflags = "";
 fc = mex.getCompilerConfigurations('fortran');
-if ~isempty(fc) && fc.ShortName == "gfortran"
-  fcMajor = regexp(fc.Version, "^(\d+)(?=\.)", "match", "once");
-  if str2double(fcMajor) < 10
-    warning("GFortran 10 is recommended")
+if ~isempty(fc)
+  if fc.ShortName == "gfortran"
+    fcMajor = regexp(fc.Version, "^(\d+)(?=\.)", "match", "once");
+    if str2double(fcMajor) < 10
+      warning("GFortran 10 is recommended")
+    end
+  elseif startsWith(fc.ShortName, "INTEL")
+    if contains(fc.Details.CompilerFlags, "/fixed")
+      % The mex_FORTRAN_win64.xml from fc.MexOpt contains COMPFLAGS=... /fixed ... that is
+      % not wanted and breaks .F90 files. Removing this flags enables .F and .F90 to work
+      % The user can do a one-time edit of this file to remove /fixed too.
+      fcflags = sprintf('COMPFLAGS="%s"', strrep(fc.Details.CompilerFlags, '/fixed', ''));
+    end
   end
 end
 
-addpath(bindir, plan.RootFolder + "/mex")
-
-plan("test:mex:blas") = matlab.buildtool.tasks.TestTask("TestMex/test_blas");
-plan("test:mex:array") = matlab.buildtool.tasks.TestTask("TestMex/test_cpp_array");
-if ~isempty(fc)
-plan("test:mex:fortran") = matlab.buildtool.tasks.TestTask("TestMex/test_fortran_mex");
-end
+plan("test:mex") = matlab.buildtool.tasks.TestTask(mexFolder + "/TestMex.m");
 
 plan("clean") = matlab.buildtool.tasks.CleanTask;
 
@@ -40,7 +45,7 @@ fullfile(example_dir, "cpp_mex/arrayProduct.cpp"), ""; ...
 ];
 
 if ~isempty(fc)
-  mexs(end+1,:) = [fullfile(refbook, "matsq.F"), ""];
+  mexs(end+1,:) = [fullfile(refbook, "matsq.F"), fcflags];
 end
 
 complex_api = "-R2018a";
@@ -50,7 +55,7 @@ for i = 1:size(mexs, 1)
   src = mexs(i, 1);
   [~, name] = fileparts(src);
 
-  plan("mex:" + name) = matlab.buildtool.tasks.MexTask(src, bindir, ...
+  plan("mex:" + name) = matlab.buildtool.tasks.MexTask(src, mexFolder, ...
       Options=[complex_api, mexs(i, 2)]);
 end
 
@@ -63,20 +68,19 @@ fullfile(plan.RootFolder, "engine/cpp.cpp"), ""; ...
 ];
 
 if ~isempty(fc)
-  engs(end+1,:) = [fullfile(plan.RootFolder, "engine/fortran.F90"), ""];
+  engs(end+1,:) = [fullfile(plan.RootFolder, "engine/fortran.F90"), fcflags];
 end
 
 for i = 1:size(engs, 1)
   src = engs(i, 1);
   [~, name] = fileparts(src);
   eng_name = "engine:" + name;
-  exe = fullfile(bindir, name);
+  exe = fullfile(engFolder, name);
   if ispc, exe = exe + ".exe"; end
 
   plan(eng_name) = matlab.buildtool.Task(Inputs=src, ...
       Outputs=exe, ...
-      Actions=@(context) mex_engine(context, src, bindir, ...
-      [complex_api, engs(i, 2)]));
+      Actions=@(context) mex_engine(context, src, engFolder, [complex_api, engs(i, 2)]));
 
   plan("test:engine:" + name) = matlab.buildtool.Task(...
       Actions=@(context) subprocess_run(context, exe));
@@ -91,7 +95,8 @@ function mex_engine(~, src, bindir, flags)
 % There isn't yet a MexEngineTask built-in, and passing "-client engine" as
 % MexTask options didn't work.
 flags(~strlength(flags)) = [];
-mex("-client", "engine", src, "-outdir", bindir, flags)
+% add the "-v" option to the mex('-client', ...) command to get good debugging
+mex("-client", "engine", src, "-outdir", bindir, flags{:})
 end
 
 
