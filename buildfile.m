@@ -14,11 +14,9 @@ plan("check") = matlab.buildtool.tasks.CodeIssuesTask(".", IncludeSubfolders=tru
 
 fc = mex.getCompilerConfigurations('fortran');
 if ~isempty(fc) && fc.ShortName == "gfortran"
-  fcMajor = regexp(fc.Version, "^(\d+)\.?", "tokens");
-  if ~isempty(fcMajor)
-    if double(string(fcMajor{1}{1})) < 10
-      warning("GFortran 10 is recommended")
-    end
+  fcMajor = regexp(fc.Version, "^(\d+)(?=\.)", "match", "once");
+  if str2double(fcMajor) < 10
+    warning("GFortran 10 is recommended")
   end
 end
 
