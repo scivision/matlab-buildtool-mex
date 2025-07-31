@@ -21,11 +21,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-22.04]
-        matlab: [latest]
-        include:
-        - os: macos-latest
-          matlab: latest
+        os: [ubuntu-22.04, macos-latest]
+        matlab: [R2025a]
+
 
     runs-on: ${{ matrix.os }}
 
@@ -72,7 +70,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-22.04, macos-latest, windows-latest]
-        matlab: [latest]
+        matlab: [R2025a]
 
     runs-on: ${{ matrix.os }}
 
@@ -93,13 +91,6 @@ jobs:
       uses: matlab-actions/run-build@v2
       with:
         tasks: check
-
-    - name: Linux GCC 10
-      if: runner.os == 'Linux'
-      run: |
-        echo "CC=gcc-10" >> $GITHUB_ENV
-        echo "CXX=g++-10" >> $GITHUB_ENV
-        echo "FC=gfortran-10" >> $GITHUB_ENV
 
     - name: Build MEX
       uses: matlab-actions/run-build@v2
