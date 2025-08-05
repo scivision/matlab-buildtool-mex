@@ -84,8 +84,51 @@ end
 
 plan("test:engine").Dependencies = "engine";
 
+%% Demonstrate using CMake
+% this is not necessary for this project, but the concept might be useful
+% for other projects
+
+buildDir = fullfile(pwd(), "build-cmake");
+
+plan("cmake:configure") = matlab.buildtool.Task(...
+    Description="Configure CMake for the project", ...
+    Actions=@(context) cmake_configure(context, buildDir));
+
+plan("cmake:build") = matlab.buildtool.Task(...
+    Description="Use CMake to build targets", ...
+    Actions=@(context) cmake_build(context, buildDir), ...
+    Dependencies="cmake:configure");
+
+plan("cmake:test") = matlab.buildtool.Task(...
+    Description="Use CTest to test targets", ...
+    Actions=@(context) cmake_test(context, buildDir), ...
+    Dependencies="cmake:build");
+
 end
 
+
+function cmake_configure(context, bindir)
+cmd = sprintf('cmake -S%s -B%s', context.Plan.RootFolder, bindir);
+s = system(cmd);
+
+assert(s == 0)
+end
+
+
+function cmake_build(~, bindir)
+cmd = sprintf('cmake --build %s', bindir);
+s = system(cmd);
+
+assert(s == 0)
+end
+
+
+function cmake_test(~, bindir)
+cmd = sprintf('ctest --test-dir %s', bindir);
+s = system(cmd);
+
+assert(s == 0)
+end
 
 function mex_engine(~, src, bindir, flags)
 % There isn't yet a MexEngineTask built-in, and passing "-client engine" as
