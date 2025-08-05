@@ -39,24 +39,20 @@ plan("clean") = matlab.buildtool.tasks.CleanTask;
 example_dir = fullfile(matlabroot, "extern/examples");
 refbook = fullfile(example_dir, "refbook");
 
-mexs = [...
-fullfile(refbook, "matrixMultiply.c"), "-lmwblas"; ...
-fullfile(example_dir, "cpp_mex/arrayProduct.cpp"), ""; ...
-];
-
-if ~isempty(fc)
-  mexs(end+1,:) = [fullfile(refbook, "matsq.F"), fcflags];
-end
-
 complex_api = "-R2018a";
 % required "newer" interleaved interface, until it becomes default
 
-for i = 1:size(mexs, 1)
-  src = mexs(i, 1);
-  [~, name] = fileparts(src);
+plan("mex:matrixMultiply") = matlab.buildtool.tasks.MexTask(fullfile(refbook, "matrixMultiply.c"), mexFolder, ...
+      Options=[complex_api, "-lmwblas"], Description="MEX C using BLAS");
 
-  plan("mex:" + name) = matlab.buildtool.tasks.MexTask(src, mexFolder, ...
-      Options=[complex_api, mexs(i, 2)]);
+plan("mex:arrayProduct") = matlab.buildtool.tasks.MexTask(fullfile(example_dir, "cpp_mex/arrayProduct.cpp"), mexFolder, ...
+    Options=complex_api, Description="MEX C++");
+
+if ~isempty(fc)
+
+plan("mex:matsq") = matlab.buildtool.tasks.MexTask(fullfile(refbook, "matsq.F"), mexFolder, ...
+    Options=complex_api, Description="MEX Fortran");
+
 end
 
 plan("test:mex").Dependencies = "mex";
