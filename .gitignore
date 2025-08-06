@@ -1,3 +1,6 @@
 .buildtool/
 *.asv
 code-issues.sarif
+
+*.exe
+*.mex*
