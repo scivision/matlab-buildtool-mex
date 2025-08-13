@@ -142,6 +142,20 @@ end
 end
 
 
+function checkTask(context)
+root = context.Plan.RootFolder;
+
+c = codeIssues(root, IncludeSubfolders=true);
+
+if isempty(c.Issues)
+  fprintf('%d files checked OK with %s under %s\n', numel(c.Files), c.Release, root)
+else
+  disp(c.Issues)
+  error("Errors found in " + join(c.Issues.Location, newline))
+end
+
+end
+
 function mex_engine(~, src, bindir, flags)
 % There isn't yet a MexEngineTask built-in, and passing "-client engine" as
 % MexTask options didn't work.

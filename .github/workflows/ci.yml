@@ -31,14 +31,16 @@ jobs:
 
     steps:
 
-    - name: Install MATLAB
+    - &matlab-install
+      name: Install MATLAB
       timeout-minutes: 10
       uses: matlab-actions/setup-matlab@v2
       with:
         release: ${{ matrix.matlab }}
         cache: true
 
-    - uses: actions/checkout@v4
+    - &checkout
+      uses: actions/checkout@v4
 
     - name: CMake configure on Linux
       if: runner.os == 'Linux'
@@ -78,14 +80,9 @@ jobs:
 
     steps:
 
-    - name: Install MATLAB
-      timeout-minutes: 10
-      uses: matlab-actions/setup-matlab@v2
-      with:
-        release: ${{ matrix.matlab }}
-        cache: true
+    - *matlab-install
 
-    - uses: actions/checkout@v4
+    - *checkout
 
     - name: Check Matlab code
       uses: matlab-actions/run-build@v2
