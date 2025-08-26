@@ -40,7 +40,7 @@ jobs:
         cache: true
 
     - &checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
 
     - name: CMake configure on Linux
       if: runner.os == 'Linux'

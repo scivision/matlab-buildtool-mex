@@ -53,32 +53,23 @@ end
 
 plan("test:mex").Dependencies = "mex";
 %% engineTask
+exe_ext = '';
+if ispc(), exe_ext = '.exe'; end
 
-engs = [...
-fullfile(plan.RootFolder, "engine/c.c"), ""; ...
-fullfile(plan.RootFolder, "engine/cpp.cpp"), ""; ...
-];
+plan("engine:c") = matlab.buildtool.Task(Inputs=fullfile(engFolder, 'c.c'), Actions=@(context) mex_engine(context, complex_api));
+plan("engine:c").Outputs = plan("engine:c").Inputs.replace('.c', exe_ext);
+plan("test:engine:c") = matlab.buildtool.Task(Inputs=plan("engine:c").Outputs, Actions=@subprocess_run, Dependencies="engine:c");
+
+plan("engine:cpp") = matlab.buildtool.Task(Inputs=fullfile(engFolder, 'cpp.cpp'), Actions=@(context) mex_engine(context, complex_api));
+plan("engine:cpp").Outputs = plan("engine:cpp").Inputs.replace('.cpp', exe_ext);
+plan("test:engine:cpp") = matlab.buildtool.Task(Inputs=plan("engine:cpp").Outputs, Actions=@subprocess_run, Dependencies="engine:cpp");
 
 if ~isempty(fc)
-  engs(end+1,:) = [fullfile(plan.RootFolder, "engine/fortran.F90"), fcflags];
+  plan("engine:fortran") = matlab.buildtool.Task(Inputs=fullfile(engFolder, 'fortran.F90'), Actions=@(context) mex_engine(context, [complex_api, fcflags]));
+  plan("engine:fortran").Outputs = plan("engine:fortran").Inputs.replace('.F90', exe_ext);
+  plan("test:engine:fortran") = matlab.buildtool.Task(Inputs=plan("engine:fortran").Outputs, Actions=@subprocess_run, Dependencies="engine:fortran");
 end
 
-for i = 1:size(engs, 1)
-  src = engs(i, 1);
-  [~, name] = fileparts(src);
-  eng_name = "engine:" + name;
-  exe = fullfile(engFolder, name);
-  if ispc, exe = exe + ".exe"; end
-
-  plan(eng_name) = matlab.buildtool.Task(Inputs=src, ...
-      Outputs=exe, ...
-      Actions=@(context) mex_engine(context, src, engFolder, [complex_api, engs(i, 2)]));
-
-  plan("test:engine:" + name) = matlab.buildtool.Task(...
-      Actions=@(context) subprocess_run(context, exe));
-end
-
-plan("test:engine").Dependencies = "engine";
 
 %% Demonstrate using CMake
 % this is not necessary for this project, but the concept might be useful
@@ -142,30 +133,18 @@ end
 end
 
 
-function checkTask(context)
-root = context.Plan.RootFolder;
-
-c = codeIssues(root, IncludeSubfolders=true);
-
-if isempty(c.Issues)
-  fprintf('%d files checked OK with %s under %s\n', numel(c.Files), c.Release, root)
-else
-  disp(c.Issues)
-  error("Errors found in " + join(c.Issues.Location, newline))
-end
-
-end
-
-function mex_engine(~, src, bindir, flags)
+function mex_engine(context, flags)
 % There isn't yet a MexEngineTask built-in, and passing "-client engine" as
 % MexTask options didn't work.
 flags(~strlength(flags)) = [];
 % add the "-v" option to the mex('-client', ...) command to get good debugging
-mex("-client", "engine", src, "-outdir", bindir, flags{:})
+mex("-client", "engine", context.Task.Inputs.paths, ...
+    "-output", context.Task.Outputs(1).paths, ...
+    flags{:})
 end
 
 
-function subprocess_run(~, exe)
+function subprocess_run(context)
 
 % sets env vars DYLD_LIBRARY_PATH, LD_LIBRARY_PATH, PATH, etc.
 matlab_bin = fullfile(matlabroot, "bin");
@@ -194,6 +173,7 @@ elseif ispc
 end
 env = namedargs2cell(envs);
 
+exe = context.Task.Inputs(1).paths;
 [stat, msg] = system(exe, env{:});
 
 assert(stat == 0, msg)
