@@ -1,4 +1,5 @@
 function plan = buildfile
+
 assert(~isMATLABReleaseOlderThan("R2024b"))
 
 plan = buildplan(localfunctions);
@@ -27,9 +28,7 @@ if ~isempty(fc)
   end
 end
 
-plan("test:mex") = matlab.buildtool.tasks.TestTask(mexFolder + "/TestMex.m");
-
-plan("clean") = matlab.buildtool.tasks.CleanTask;
+plan("clean") = matlab.buildtool.tasks.CleanTask();
 
 %% MexTask
 example_dir = fullfile(matlabroot, "extern/examples");
@@ -44,14 +43,15 @@ plan("mex:matrixMultiply") = matlab.buildtool.tasks.MexTask(fullfile(refbook, "m
 plan("mex:arrayProduct") = matlab.buildtool.tasks.MexTask(fullfile(example_dir, "cpp_mex/arrayProduct.cpp"), mexFolder, ...
     Options=complex_api, Description="MEX C++");
 
+tags = "cpp";
 if ~isempty(fc)
-
-plan("mex:matsq") = matlab.buildtool.tasks.MexTask(fullfile(refbook, "matsq.F"), mexFolder, ...
-    Options=complex_api, Description="MEX Fortran");
-
+  plan("mex:matsq") = matlab.buildtool.tasks.MexTask(fullfile(refbook, "matsq.F"), mexFolder, ...
+      Options=complex_api, Description="MEX Fortran");
+  tags = [tags, "fortran"];
 end
 
-plan("test:mex").Dependencies = "mex";
+plan("test:mex") = matlab.buildtool.tasks.TestTask(mexFolder + "/TestMex.m", Dependencies = "mex", ...
+    Tag=tags);
 %% engineTask
 exe_ext = '';
 if ispc(), exe_ext = '.exe'; end

@@ -1,13 +1,7 @@
-classdef TestMex < matlab.unittest.TestCase
+classdef (SharedTestFixtures={ matlab.unittest.fixtures.PathFixture(".")}) ...
+  TestMex < matlab.unittest.TestCase
 
-methods(TestClassSetup)
-function pkg_path(tc)
-p = matlab.unittest.fixtures.PathFixture(fileparts(mfilename('fullpath')));
-tc.applyFixture(p)
-end
-end
-
-methods(Test)
+methods(Test, TestTags={'cpp'})
 
 function test_blas(tc)
 
@@ -35,6 +29,11 @@ end
 
 tc.verifyEqual(x, 2*a)
 end
+
+end
+
+
+methods (Test, TestTags={'fortran'})
 
 function test_fortran_mex(tc)
 
