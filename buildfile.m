@@ -6,7 +6,6 @@ plan = buildplan(localfunctions);
 
 plan.DefaultTasks = "test";
 
-
 mexFolder = plan.RootFolder + "/mex";
 engFolder = plan.RootFolder + "/engine";
 
@@ -50,25 +49,23 @@ if ~isempty(fc)
   tags = [tags, "fortran"];
 end
 
-plan("test:mex") = matlab.buildtool.tasks.TestTask(mexFolder + "/TestMex.m", Dependencies = "mex", ...
-    Tag=tags);
+plan("test:mex") = matlab.buildtool.tasks.TestTask(mexFolder + "/TestMex.m", Dependencies="mex", Tag=tags);
 %% engineTask
 exe_ext = '';
 if ispc(), exe_ext = '.exe'; end
 
 plan("engine:c") = matlab.buildtool.Task(Inputs=fullfile(engFolder, 'c.c'), Actions=@(context) mex_engine(context, complex_api));
 plan("engine:c").Outputs = plan("engine:c").Inputs.replace('.c', exe_ext);
-plan("test:engine:c") = matlab.buildtool.Task(Inputs=plan("engine:c").Outputs, Actions=@subprocess_run, Dependencies="engine:c");
 
 plan("engine:cpp") = matlab.buildtool.Task(Inputs=fullfile(engFolder, 'cpp.cpp'), Actions=@(context) mex_engine(context, complex_api));
 plan("engine:cpp").Outputs = plan("engine:cpp").Inputs.replace('.cpp', exe_ext);
-plan("test:engine:cpp") = matlab.buildtool.Task(Inputs=plan("engine:cpp").Outputs, Actions=@subprocess_run, Dependencies="engine:cpp");
 
 if ~isempty(fc)
   plan("engine:fortran") = matlab.buildtool.Task(Inputs=fullfile(engFolder, 'fortran.F90'), Actions=@(context) mex_engine(context, [complex_api, fcflags]));
   plan("engine:fortran").Outputs = plan("engine:fortran").Inputs.replace('.F90', exe_ext);
-  plan("test:engine:fortran") = matlab.buildtool.Task(Inputs=plan("engine:fortran").Outputs, Actions=@subprocess_run, Dependencies="engine:fortran");
 end
+
+plan("test:engine") = matlab.buildtool.Task(Inputs=[plan("engine").Tasks.Outputs], Dependencies="engine", Action=@engine_test);
 
 
 %% Demonstrate using CMake
@@ -144,37 +141,19 @@ mex("-client", "engine", context.Task.Inputs.paths, ...
 end
 
 
-function subprocess_run(context)
+function engine_test(context)
 
-% sets env vars DYLD_LIBRARY_PATH, LD_LIBRARY_PATH, PATH, etc.
-matlab_bin = fullfile(matlabroot, "bin");
-mustBeFolder(matlab_bin)
+[~, names] = fileparts(context.Task.Inputs.paths);
+names = names + ".exe";
 
-matlab_extern_bin = fullfile(matlabroot, "extern/bin", computer("arch"));
-mustBeFolder(matlab_extern_bin)
+param = matlab.unittest.parameters.Parameter.fromData("exe", cellstr(names));
 
-matlab_arch_bin = fullfile(matlab_bin, computer("arch"));
-mustBeFolder(matlab_arch_bin)
+suite = matlab.unittest.TestSuite.fromFile(context.Plan.RootFolder + "/engine/TestEngine.m", ...
+          ExternalParameters=param);
 
-newpath = join([matlab_bin, getenv("PATH")], pathsep);
+runner = matlab.unittest.TestRunner.withTextOutput;
+r = runner.run(suite);
 
-envs = struct();
-if ismac
-  envs = struct(DYLD_LIBRARY_PATH=matlab_arch_bin, ...
-                PATH=newpath);
-elseif isunix
-  linux_sys = fullfile(matlabroot, "sys/os", computer("arch"));
+assertSuccess(r);
 
-  envs = struct(...
-      LD_LIBRARY_PATH=join([matlab_arch_bin, matlab_extern_bin, linux_sys], pathsep), ...
-      PATH=newpath);
-elseif ispc
-  envs = struct(PATH=join([matlab_arch_bin, matlab_extern_bin, newpath], pathsep));
-end
-env = namedargs2cell(envs);
-
-exe = context.Task.Inputs(1).paths;
-[stat, msg] = system(exe, env{:});
-
-assert(stat == 0, msg)
 end
