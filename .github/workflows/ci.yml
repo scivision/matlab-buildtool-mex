@@ -72,7 +72,10 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-22.04, macos-latest, windows-latest]
-        matlab: [R2025a]
+        matlab: [R2025b]
+        include:
+        - os: ubuntu-22.04
+          matlab: R2024b
 
     runs-on: ${{ matrix.os }}
 
