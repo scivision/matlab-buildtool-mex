@@ -40,7 +40,7 @@ jobs:
         cache: true
 
     - &checkout
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
 
     - name: CMake configure on Linux
       if: runner.os == 'Linux'
@@ -107,8 +107,7 @@ jobs:
       with:
         tasks: test:mex
 
-# Matlab Engine doesn't work on GitHub runners
-    # - name: Test Matlab Engine
-    #   uses: matlab-actions/run-build@v2
-    #   with:
-    #     tasks: test:engine
+    - name: Test Matlab Engine
+      uses: matlab-actions/run-build@v2
+      with:
+        tasks: test:engine
