@@ -40,20 +40,18 @@ buildtool test:engine
 ```
 
 The Matlab Engine examples might be shaky on certain systems and configurations.
-Try running each example individually to see if any work.
-List tasks by:
+Specifically on macOS, across Matlab versions, there is a segfault (error code 139) on any of the Matlab Engine examples.
+We have attempted a DYLD_LIBRARY_PATH workaround for this issue, but it has not been successful.
+For Linux and Windows, the Matlab Engine examples worked correctly for us.
 
-```matlab
-buildtool -tasks all
-```
+On GitHub Actions, the Matlab Engine examples do not work, and are currently disabled in the CI workflow.
+The errors on GitHub Actions only are:
 
-Examples of running individual tests:
+language / OS | macOS | Linux | Windows
+------------- | ----- | ----- | -------
+C   | segfault (139) | Can't start MATLAB C engine | Can't start MATLAB C engine
+C++ | segfault (139) | terminate called after throwing an instance of 'matlab::engine::EngineException' what():  MATLAB process cannot be created. | error (-1073740791)
 
-```matlab
-buildtool test:engine:c
-buildtool test:engine:cpp
-buildtool test:engine:fortran
-```
 
 ## CMake
 

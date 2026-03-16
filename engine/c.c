@@ -32,15 +32,15 @@ mxArray *T = NULL;
 char buffer[BUFSIZE+1];
 double time[10] = { 0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0 };
 
-printf("C engine: Starting MATLAB engine...\n");
+printf("Starting MATLAB C engine...\n");
 ep = engOpen(NULL);
 
 if (!ep) {
-  fprintf(stderr, "\nCan't start MATLAB engine\n");
+  fprintf(stderr, "\nCan't start MATLAB C engine\n");
   return EXIT_FAILURE;
 }
 
-printf("Matlab C engine started\n");
+printf("MATLAB C engine started\n");
 
 /* Create a variable for the data */
 T = mxCreateDoubleMatrix(1, 10, mxREAL);

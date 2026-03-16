@@ -27,11 +27,11 @@ if(!env_diagnose()) {
   optionVec.push_back(u"-nodesktop");
   optionVec.push_back(u"-nosplash");
 
-  std::cout << "C++ engine: Start MATLAB engine" << std::endl;
+  std::cout << "Starting MATLAB C++ engine" << std::endl;
   std::unique_ptr<matlab::engine::MATLABEngine> matlabPtr =
     matlab::engine::startMATLAB(optionVec);
 
-  std::cout << "C++ engine: Create MATLAB data array factory" << std::endl;
+  std::cout << "MATLAB C++ engine: Create MATLAB data array factory" << std::endl;
   // https://www.mathworks.com/help/matlab/matlab-data-array.html
   matlab::data::ArrayFactory factory;
 
@@ -60,7 +60,7 @@ if(!env_diagnose()) {
   // Display the result
   int i = 0;
   for (auto r : A) {
-      std::cout << "results[" << i << "] = " << r << "\n";
+      std::cout << "MATLAB C++ engine: results[" << i << "] = " << r << "\n";
       ++i;
   }
 
