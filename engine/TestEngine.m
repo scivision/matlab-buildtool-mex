@@ -30,7 +30,7 @@ newpath = join([matlab_bin, getenv("PATH")], pathsep);
 
 tc.envs = dictionary(PATH=newpath);
 if ismac
-  tc.envs("dummy_LIBRARY_PATH") = matlab_arch_bin;
+  tc.envs("dummy_LIBRARY_PATH") = join([matlab_extern_bin, matlab_arch_bin], pathsep);
 elseif isunix
   linux_sys = fullfile(matlabroot, "sys/os", computer("arch"));
 

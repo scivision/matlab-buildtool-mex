@@ -20,13 +20,15 @@ if(!env_diagnose()) {
   return 77;
 }
 
-  //save startup time for Matlab < R2025a
+  // NOTE: we use std::endl to print immediately in case of a segfault etc.
+
   std::vector<matlab::engine::String> optionVec;
   optionVec.push_back(u"-nojvm");
+  optionVec.push_back(u"-nodesktop");
+  optionVec.push_back(u"-nosplash");
 
-  std::cout << "Start MATLAB engine synchronously" << std::endl;
   std::unique_ptr<matlab::engine::MATLABEngine> matlabPtr =
-      matlab::engine::startMATLAB(optionVec);
+    matlab::engine::startMATLAB(optionVec);
 
   std::cout << "Create MATLAB data array factory" << std::endl;
   // https://www.mathworks.com/help/matlab/matlab-data-array.html
