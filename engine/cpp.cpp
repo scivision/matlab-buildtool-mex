@@ -27,10 +27,11 @@ if(!env_diagnose()) {
   optionVec.push_back(u"-nodesktop");
   optionVec.push_back(u"-nosplash");
 
+  std::cout << "C++ engine: Start MATLAB engine" << std::endl;
   std::unique_ptr<matlab::engine::MATLABEngine> matlabPtr =
     matlab::engine::startMATLAB(optionVec);
 
-  std::cout << "Create MATLAB data array factory" << std::endl;
+  std::cout << "C++ engine: Create MATLAB data array factory" << std::endl;
   // https://www.mathworks.com/help/matlab/matlab-data-array.html
   matlab::data::ArrayFactory factory;
 

@@ -32,6 +32,7 @@ mxArray *T = NULL;
 char buffer[BUFSIZE+1];
 double time[10] = { 0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0 };
 
+printf("C engine: Starting MATLAB engine...\n");
 ep = engOpen(NULL);
 
 if (!ep) {
@@ -39,7 +40,7 @@ if (!ep) {
   return EXIT_FAILURE;
 }
 
-printf("Matlab engine started\n");
+printf("Matlab C engine started\n");
 
 /* Create a variable for the data */
 T = mxCreateDoubleMatrix(1, 10, mxREAL);
@@ -53,7 +54,7 @@ engPutVariable(ep, "T", T);
 	*/
 engEvalString(ep, "D = .5.*(-9.8).*T.^2;");
 
-printf("Done with Matlab Engine demo.\n");
+printf("Done with Matlab C Engine demo.\n");
 mxDestroyArray(T);
 
 engClose(ep);
