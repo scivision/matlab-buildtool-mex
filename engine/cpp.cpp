@@ -12,27 +12,42 @@
 
 void diagnose(void)
 {
-    std::string reqEnv;
+  std::string reqEnv;
+  char* r;
+
 #ifdef __APPLE__
-    reqEnv = "DYLD_LIBRARY_PATH";
+  reqEnv = "DYLD_dummy_LIBRARY_PATH";  // dummy name to bypass macOS security
+  r = std::getenv(reqEnv.data());
+  if (!r){
+    std::cerr << "C++ exe: workaround environment variable " << reqEnv << " not set, run will fail, aborting...\n";
+    std::exit(77);
+  }
+  reqEnv = "DYLD_LIBRARY_PATH";
+  if(::setenv(reqEnv.data(), r, 1) != 0){
+    std::cerr << "C++ exe: error setting environment variable " << reqEnv << "\n";
+    std::exit(77);
+  }
 #elif defined(__linux__)
-    reqEnv = "LD_LIBRARY_PATH";
+  reqEnv = "LD_LIBRARY_PATH";
 #elif defined(_WIN32)
-    reqEnv = "PATH";
+  reqEnv = "PATH";
 #endif
 
-    auto r = std::getenv(reqEnv.data());
+
+#ifndef _WIN32
+  r = std::getenv("PATH");
+  if (r)
+    std::cout << "PATH: " << r << "\n";
+#endif
+
+    r = std::getenv(reqEnv.data());
     if (!r){
-      std::cout << reqEnv << " not set, run will fail, aborting...\n";
+      std::cerr << "C++ exe: environment variable " << reqEnv << " not set, run will fail, aborting...\n";
       std::exit(77);
     }
 
     std::cout << reqEnv << ": " << r << "\n";
 
-#ifndef _WIN32
-    r = std::getenv("PATH");
-    if (r) std::cout << "PATH: " << r << "\n";
-#endif
 }
 
 int main() {

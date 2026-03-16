@@ -29,7 +29,7 @@ const char* reqEnv =
 
   char* p = getenv(reqEnv);
   if(!p) {
-	fprintf(stderr, "%s not set, run will fail, aborting...\n", reqEnv);
+	fprintf(stderr, "C exe: environment variable %s not set, run will fail, aborting...\n", reqEnv);
 	exit(77);
   }
   printf("%s: %s\n", reqEnv, p);
