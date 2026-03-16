@@ -16,7 +16,7 @@ void diagnose(void)
   char* r;
 
 #ifdef __APPLE__
-  reqEnv = "DYLD_dummy_LIBRARY_PATH";  // dummy name to bypass macOS security
+  reqEnv = "dummy_LIBRARY_PATH";  // dummy name to bypass macOS security - cannot even start with DYLD !
   r = std::getenv(reqEnv.data());
   if (!r){
     std::cerr << "C++ exe: workaround environment variable " << reqEnv << " not set, run will fail, aborting...\n";

@@ -20,7 +20,17 @@ void diagnose(void)
 {
 const char* reqEnv =
 #ifdef __APPLE__
-   "DYLD_LIBRARY_PATH";
+   "dummy_LIBRARY_PATH"; // dummy name to bypass macOS security - cannot even start with DYLD !
+  char* r = getenv(reqEnv);
+  if (!r){
+    fprintf(stderr, "C exe: workaround environment variable %s not set, run will fail, aborting...\n", reqEnv);
+    exit(77);
+  }
+  reqEnv = "DYLD_LIBRARY_PATH";
+  if(setenv(reqEnv, r, 1) != 0){
+    fprintf(stderr, "C exe: error setting environment variable %s\n", reqEnv);
+    exit(77);
+  }
 #elif defined(__linux__)
    "LD_LIBRARY_PATH";
 #elif defined(_WIN32)
