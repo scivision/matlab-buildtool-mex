@@ -14,46 +14,17 @@
 
 #include "engine.h"
 
+#include "env_diagnose.h"
+
 #define  BUFSIZE 256
 
-void diagnose(void)
-{
-const char* reqEnv =
-#ifdef __APPLE__
-   "dummy_LIBRARY_PATH"; // dummy name to bypass macOS security - cannot even start with DYLD !
-  char* r = getenv(reqEnv);
-  if (!r){
-    fprintf(stderr, "C exe: workaround environment variable %s not set, run will fail, aborting...\n", reqEnv);
-    exit(77);
-  }
-  reqEnv = "DYLD_LIBRARY_PATH";
-  if(setenv(reqEnv, r, 1) != 0){
-    fprintf(stderr, "C exe: error setting environment variable %s\n", reqEnv);
-    exit(77);
-  }
-#elif defined(__linux__)
-   "LD_LIBRARY_PATH";
-#elif defined(_WIN32)
-   "PATH";
-#endif
-
-  char* p = getenv(reqEnv);
-  if(!p) {
-	fprintf(stderr, "C exe: environment variable %s not set, run will fail, aborting...\n", reqEnv);
-	exit(77);
-  }
-  printf("%s: %s\n", reqEnv, p);
-
-#ifndef _WIN32
-	p = getenv("PATH");
-	if(p) printf("PATH: %s\n", p);
-#endif
-}
 
 int main(void)
 {
 
-diagnose();
+if(!env_diagnose()) {
+  return 77;
+}
 
 Engine *ep;
 

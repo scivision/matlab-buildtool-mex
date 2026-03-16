@@ -59,14 +59,23 @@ end
 
 engine_flags = [complex_api, "-v"];
 
-plan("engine:c") = matlab.buildtool.Task(Inputs=fullfile(engFolder, 'c.c'), Actions=@(context) mex_engine(context, engine_flags));
-plan("engine:c").Outputs = plan("engine:c").Inputs.replace('.c', exe_ext);
+plan("engine:c") = matlab.buildtool.Task(...
+  Inputs=fullfile(engFolder, ["c.c", "env_diagnose.c"]), ...
+  Actions=@(context) mex_engine(context, engine_flags));
 
-plan("engine:cpp") = matlab.buildtool.Task(Inputs=fullfile(engFolder, 'cpp.cpp'), Actions=@(context) mex_engine(context, engine_flags));
-plan("engine:cpp").Outputs = plan("engine:cpp").Inputs.replace('.cpp', exe_ext);
+plan("engine:c").Outputs = plan("engine:c").Inputs(1).replace('.c', exe_ext);
+
+plan("engine:cpp") = matlab.buildtool.Task(...
+  Inputs=fullfile(engFolder, ["cpp.cpp", "env_diagnose.c"]), ...
+  Actions=@(context) mex_engine(context, engine_flags));
+
+plan("engine:cpp").Outputs = plan("engine:cpp").Inputs(1).replace('.cpp', exe_ext);
 
 if ~isempty(fc)
-  plan("engine:fortran") = matlab.buildtool.Task(Inputs=fullfile(engFolder, 'fortran.F90'), Actions=@(context) mex_engine(context, [engine_flags, fcflags]));
+  plan("engine:fortran") = matlab.buildtool.Task(...
+    Inputs=fullfile(engFolder, 'fortran.F90'), ...
+    Actions=@(context) mex_engine(context, [engine_flags, fcflags]));
+
   plan("engine:fortran").Outputs = plan("engine:fortran").Inputs.replace('.F90', exe_ext);
 end
 
@@ -139,9 +148,9 @@ function mex_engine(context, flags)
 % There isn't yet a MexEngineTask built-in, and passing "-client engine" as
 % MexTask options didn't work.
 flags(~strlength(flags)) = [];
-% add the "-v" option to the mex('-client', ...) command to get good debugging
-mex("-client", "engine", context.Task.Inputs.paths, ...
-    "-output", context.Task.Outputs(1).paths, ...
+
+mex("-client", "engine", context.Task.Inputs.paths{:}, ...
+    "-output", context.Task.Outputs.paths, ...
     flags{:})
 end
 
