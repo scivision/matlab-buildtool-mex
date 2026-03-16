@@ -52,16 +52,21 @@ end
 plan("test:mex") = matlab.buildtool.tasks.TestTask(mexFolder + "/TestMex.m", Dependencies="mex", Tag=tags);
 %% engineTask
 exe_ext = '';
-if ispc(), exe_ext = '.exe'; end
+if ispc()
+  exe_ext = '.exe';
+  % mex -output ignores .exe extension on non-Windows
+end
 
-plan("engine:c") = matlab.buildtool.Task(Inputs=fullfile(engFolder, 'c.c'), Actions=@(context) mex_engine(context, complex_api));
+engine_flags = [complex_api, "-v"];
+
+plan("engine:c") = matlab.buildtool.Task(Inputs=fullfile(engFolder, 'c.c'), Actions=@(context) mex_engine(context, engine_flags));
 plan("engine:c").Outputs = plan("engine:c").Inputs.replace('.c', exe_ext);
 
-plan("engine:cpp") = matlab.buildtool.Task(Inputs=fullfile(engFolder, 'cpp.cpp'), Actions=@(context) mex_engine(context, complex_api));
+plan("engine:cpp") = matlab.buildtool.Task(Inputs=fullfile(engFolder, 'cpp.cpp'), Actions=@(context) mex_engine(context, engine_flags));
 plan("engine:cpp").Outputs = plan("engine:cpp").Inputs.replace('.cpp', exe_ext);
 
 if ~isempty(fc)
-  plan("engine:fortran") = matlab.buildtool.Task(Inputs=fullfile(engFolder, 'fortran.F90'), Actions=@(context) mex_engine(context, [complex_api, fcflags]));
+  plan("engine:fortran") = matlab.buildtool.Task(Inputs=fullfile(engFolder, 'fortran.F90'), Actions=@(context) mex_engine(context, [engine_flags, fcflags]));
   plan("engine:fortran").Outputs = plan("engine:fortran").Inputs.replace('.F90', exe_ext);
 end
 
@@ -144,7 +149,9 @@ end
 function engine_test(context)
 
 [~, names] = fileparts(context.Task.Inputs.paths);
-names = names + ".exe";
+if ispc
+  names = names + ".exe";
+end
 
 param = matlab.unittest.parameters.Parameter.fromData("exe", cellstr(names));
 
