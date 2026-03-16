@@ -2,5 +2,8 @@
 *.asv
 code-issues.sarif
 
+engine/c_demo
+engine/cpp_demo
+engine/fortran_demo
 *.exe
 *.mex*

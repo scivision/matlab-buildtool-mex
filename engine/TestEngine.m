@@ -7,7 +7,7 @@ envs
 end
 
 properties (TestParameter)
-exe = {"c", "cpp", "fortran"}
+exe = {"c_demo", "cpp_demo", "fortran_demo"}
 end
 
 methods (TestClassSetup)

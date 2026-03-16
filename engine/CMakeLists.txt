@@ -6,18 +6,18 @@ set(_method "wrap")
 
 if(_method STREQUAL "cmake")
 
-  add_executable(engine_c c.c)
+  add_executable(engine_c c_demo.c)
   target_link_libraries(engine_c PRIVATE Matlab::eng)
   set(exe $<TARGET_FILE:engine_c>)
 
 elseif(_method STREQUAL "find")
 
-  matlab_add_mex(NAME engine_c EXECUTABLE SRC c.c LINK_TO ${Matlab_LIBRARIES})
+  matlab_add_mex(NAME engine_c EXECUTABLE SRC c_demo.c LINK_TO ${Matlab_LIBRARIES})
   set(exe $<TARGET_FILE:engine_c>)
 
 elseif(_method STREQUAL "wrap")
 
-  set(src ${CMAKE_CURRENT_SOURCE_DIR}/c.c)
+  set(src ${CMAKE_CURRENT_SOURCE_DIR}/c_demo.c)
   # have to name exe distinctively from target or Ninja will get dependency cycle error
   set(exe ${CMAKE_CURRENT_BINARY_DIR}/engineC${CMAKE_EXECUTABLE_SUFFIX})
 
@@ -37,7 +37,7 @@ matlab_libpath(EngineC)
 
 if(_method STREQUAL "cmake")
 
-  add_executable(engine_cpp cpp.cpp)
+  add_executable(engine_cpp cpp_demo.cpp)
   if(APPLE)
     message(VERBOSE "macOS engine workaround to avoid header include failure with R2024b")
     target_compile_features(engine_cpp PRIVATE cxx_std_11)
@@ -47,12 +47,12 @@ if(_method STREQUAL "cmake")
 
 elseif(_method STREQUAL "find")
 
-  matlab_add_mex(NAME engine_cpp EXECUTABLE SRC cpp.cpp LINK_TO ${Matlab_LIBRARIES})
+  matlab_add_mex(NAME engine_cpp EXECUTABLE SRC cpp_demo.cpp LINK_TO ${Matlab_LIBRARIES})
   set(exe $<TARGET_FILE:engine_cpp>)
 
 elseif(_method STREQUAL "wrap")
 
-  set(src ${CMAKE_CURRENT_SOURCE_DIR}/cpp.cpp)
+  set(src ${CMAKE_CURRENT_SOURCE_DIR}/cpp_demo.cpp)
   set(exe ${CMAKE_CURRENT_BINARY_DIR}/engineCpp${CMAKE_EXECUTABLE_SUFFIX})
 
   add_custom_command(OUTPUT ${exe}
@@ -73,17 +73,17 @@ matlab_libpath(EngineCpp)
 if(Matlab_mex_Fortran)
 
 if(_method STREQUAL "cmake")
-  add_executable(engine_fortran fortran.F90)
+  add_executable(engine_fortran fortran_demo.F90)
   target_link_libraries(engine_fortran PRIVATE Matlab::eng)
   set(exe $<TARGET_FILE:engine_fortran>)
 elseif(_method STREQUAL "find")
 
-  matlab_add_mex(NAME engine_fortran EXECUTABLE SRC fortran.F90 LINK_TO ${Matlab_LIBRARIES})
+  matlab_add_mex(NAME engine_fortran EXECUTABLE SRC fortran_demo.F90 LINK_TO ${Matlab_LIBRARIES})
   set(exe $<TARGET_FILE:engine_fortran>)
 
 elseif(_method STREQUAL "wrap")
 
-  set(src ${CMAKE_CURRENT_SOURCE_DIR}/fortran.F90)
+  set(src ${CMAKE_CURRENT_SOURCE_DIR}/fortran_demo.F90)
   set(exe ${CMAKE_CURRENT_BINARY_DIR}/engineFortran${CMAKE_EXECUTABLE_SUFFIX})
 
   add_custom_command(OUTPUT ${exe}
