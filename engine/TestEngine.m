@@ -54,8 +54,8 @@ methods (Test)
 
 function test_engine_run(tc, exe)
 
-  exe = fullfile(tc.cwd, exe);
-  tc.assumeThat(exe, matlab.unittest.constraints.IsFile, "test executable " + exe + " not found, skipping test")
+exe = fullfile(tc.cwd, exe);
+tc.assumeThat(exe, matlab.unittest.constraints.IsFile, "test executable " + exe + " not found, skipping test")
 
 % convert dictionary of env vars to name,value string array for system call
 keys = cellstr(tc.envs.keys);
@@ -64,9 +64,19 @@ envCell = reshape([keys(:).'; vals(:).'], 1, []);
 
 % disp("Applying environment varables to " + exe)
 % disp(envCell)
-[stat, msg] = system(exe, envCell{:});
 
-  tc.verifyEqual(stat, 0, msg)
+if ismac
+% use wrapper script to set env vars for macOS, since DYLD_LIBRARY_PATH is ignored in system() call
+  wrapper = fullfile(tc.cwd, "macos_dyld_wrapper.sh");
+  tc.assertThat(wrapper, matlab.unittest.constraints.IsFile, "wrapper script " + wrapper + " not found, skipping test")
+  cmd = wrapper + " " + exe;
+else
+  cmd = exe;
+end
+
+[stat, msg] = system(cmd, envCell{:});
+
+tc.verifyEqual(stat, 0, msg)
 end
 
 end
