@@ -47,8 +47,9 @@ function(matlab_libpath test_names)
 
 if(APPLE)
   set_property(TEST ${test_names} PROPERTY
-  ENVIRONMENT_MODIFICATION "DYLD_LIBRARY_PATH=path_list_prepend:${Matlab_EXTERN_BINARIES_DIR};PATH=path_list_prepend:${Matlab_ROOT_DIR}/bin"
+  ENVIRONMENT_MODIFICATION "DYLD_LIBRARY_PATH=path_list_prepend:${Matlab_EXTERN_BINARIES_DIR};DYLD_LIBRARY_PATH=path_list_prepend:${Matlab_BINARIES_DIR};PATH=path_list_prepend:${Matlab_ROOT_DIR}/bin"
   )
+  # need Extern_binaries and Binaries or segfault on EngineC run
 elseif(WIN32)
   set_property(TEST ${test_names} PROPERTY
   ENVIRONMENT_MODIFICATION "PATH=path_list_prepend:${Matlab_BINARIES_DIR};PATH=path_list_prepend:${Matlab_EXTERN_BINARIES_DIR};PATH=path_list_prepend:${Matlab_ROOT_DIR}/bin"

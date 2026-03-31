@@ -1,23 +1,21 @@
 set_property(DIRECTORY PROPERTY LABELS "engine")
 
-set(_method "wrap")
-
 # --- C calling Matlab Engine
 
-if(_method STREQUAL "cmake")
+if(eng_method STREQUAL "cmake")
 
   add_executable(engine_c c_demo.c)
   target_link_libraries(engine_c PRIVATE Matlab::eng)
   set(exe $<TARGET_FILE:engine_c>)
 
-elseif(_method STREQUAL "find")
+elseif(eng_method STREQUAL "find")
 
   matlab_add_mex(NAME engine_c EXECUTABLE SRC c_demo.c LINK_TO ${Matlab_LIBRARIES})
   set(exe $<TARGET_FILE:engine_c>)
 
-elseif(_method STREQUAL "wrap")
+elseif(eng_method STREQUAL "wrap")
 
-  set(src ${CMAKE_CURRENT_SOURCE_DIR}/c_demo.c)
+  set(src ${CMAKE_CURRENT_SOURCE_DIR}/c_demo.c ${CMAKE_CURRENT_SOURCE_DIR}/env_diagnose.c)
   # have to name exe distinctively from target or Ninja will get dependency cycle error
   set(exe ${CMAKE_CURRENT_BINARY_DIR}/engineC${CMAKE_EXECUTABLE_SUFFIX})
 
@@ -35,7 +33,7 @@ matlab_libpath(EngineC)
 
 # --- C++ calling Matlab engine
 
-if(_method STREQUAL "cmake")
+if(eng_method STREQUAL "cmake")
 
   add_executable(engine_cpp cpp_demo.cpp)
   if(APPLE)
@@ -45,14 +43,14 @@ if(_method STREQUAL "cmake")
   target_link_libraries(engine_cpp PRIVATE Matlab::MatlabEngine Matlab::MatlabDataArray ${CMAKE_THREAD_LIBS_INIT})
   set(exe $<TARGET_FILE:engine_cpp>)
 
-elseif(_method STREQUAL "find")
+elseif(eng_method STREQUAL "find")
 
   matlab_add_mex(NAME engine_cpp EXECUTABLE SRC cpp_demo.cpp LINK_TO ${Matlab_LIBRARIES})
   set(exe $<TARGET_FILE:engine_cpp>)
 
-elseif(_method STREQUAL "wrap")
+elseif(eng_method STREQUAL "wrap")
 
-  set(src ${CMAKE_CURRENT_SOURCE_DIR}/cpp_demo.cpp)
+  set(src ${CMAKE_CURRENT_SOURCE_DIR}/cpp_demo.cpp ${CMAKE_CURRENT_SOURCE_DIR}/env_diagnose.c)
   set(exe ${CMAKE_CURRENT_BINARY_DIR}/engineCpp${CMAKE_EXECUTABLE_SUFFIX})
 
   add_custom_command(OUTPUT ${exe}
@@ -72,16 +70,16 @@ matlab_libpath(EngineCpp)
 
 if(Matlab_mex_Fortran)
 
-if(_method STREQUAL "cmake")
+if(eng_method STREQUAL "cmake")
   add_executable(engine_fortran fortran_demo.F90)
   target_link_libraries(engine_fortran PRIVATE Matlab::eng)
   set(exe $<TARGET_FILE:engine_fortran>)
-elseif(_method STREQUAL "find")
+elseif(eng_method STREQUAL "find")
 
   matlab_add_mex(NAME engine_fortran EXECUTABLE SRC fortran_demo.F90 LINK_TO ${Matlab_LIBRARIES})
   set(exe $<TARGET_FILE:engine_fortran>)
 
-elseif(_method STREQUAL "wrap")
+elseif(eng_method STREQUAL "wrap")
 
   set(src ${CMAKE_CURRENT_SOURCE_DIR}/fortran_demo.F90)
   set(exe ${CMAKE_CURRENT_BINARY_DIR}/engineFortran${CMAKE_EXECUTABLE_SUFFIX})

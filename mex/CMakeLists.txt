@@ -2,9 +2,6 @@
 
 set_property(DIRECTORY PROPERTY LABELS "mex")
 
-
-set(_method wrap)
-
 # --- C Mex
 
 find_file(matmul_src
@@ -15,7 +12,7 @@ PATHS ${Matlab_ROOT_DIR}/extern/examples/refbook
 
 if(matmul_src AND Matlab_MEX_BLAS)
 
-if(_method STREQUAL "wrap")
+if(mex_method STREQUAL "wrap")
 
   add_custom_command(OUTPUT matrixMultiply.${Matlab_MEX_SUFFIX}
   COMMAND ${Matlab_MEX_COMPILER} -R2018a ${CMAKE_LIBRARY_PATH_FLAG}${Matlab_EXTERN_LIBRARY_DIR} ${Matlab_MEX_BLAS} ${matmul_src}
@@ -24,16 +21,11 @@ if(_method STREQUAL "wrap")
 
   add_custom_target(matrixMultiply ALL DEPENDS matrixMultiply.${Matlab_MEX_SUFFIX})
 
-elseif(_method STREQUAL "find")
+elseif(mex_method STREQUAL "find")
   matlab_add_mex(NAME matrixMultiply SHARED SRC ${matmul_src} LINK_TO ${Matlab_MEX_BLAS})
 endif()
 
 endif()
-
-add_test(NAME C_MEX_BLAS
-COMMAND ${Matlab_MAIN_PROGRAM} -sd ${PROJECT_SOURCE_DIR} -batch "buildtool test:mex:blas"
-)
-set_property(TEST C_MEX_BLAS PROPERTY DISABLED $<OR:$<NOT:$<TARGET_EXISTS:matrixMultiply>>,$<VERSION_LESS:${Matlab_VERSION},24.2>>)
 
 # --- C++ Mex
 
@@ -45,7 +37,7 @@ PATHS ${Matlab_ROOT_DIR}/extern/examples/cpp_mex
 
 if(array_src)
 
-if(_method STREQUAL "wrap")
+if(mex_method STREQUAL "wrap")
 
   add_custom_command(OUTPUT arrayProduct.${Matlab_MEX_SUFFIX}
   COMMAND ${Matlab_MEX_COMPILER} -R2018a ${array_src}
@@ -54,7 +46,7 @@ if(_method STREQUAL "wrap")
 
   add_custom_target(arrayProduct ALL DEPENDS arrayProduct.${Matlab_MEX_SUFFIX})
 
-elseif(_method STREQUAL "find")
+elseif(mex_method STREQUAL "find")
 
 matlab_add_mex(NAME arrayProduct SHARED SRC ${array_src})
 if(APPLE)
@@ -66,12 +58,11 @@ endif()
 
 endif()
 
-add_test(NAME CppMex
-COMMAND ${Matlab_MAIN_PROGRAM} -sd ${PROJECT_SOURCE_DIR} -batch "buildtool test:mex:array"
+add_test(NAME CCppMex
+COMMAND ${Matlab_MAIN_PROGRAM} -sd ${PROJECT_SOURCE_DIR} -batch "buildtool test:mex"
 )
 
-set_property(TEST CppMex PROPERTY DISABLED $<OR:$<NOT:$<TARGET_EXISTS:arrayProduct>>,$<VERSION_LESS:${Matlab_VERSION},24.2>>)
-
+set_property(TEST CCppMex PROPERTY DISABLED $<VERSION_LESS:${Matlab_VERSION},24.2>)
 
 # --- Fortran Mex called from Matlab
 
@@ -83,7 +74,7 @@ PATHS ${Matlab_ROOT_DIR}/extern/examples/refbook
 
 if(matsq_src AND Matlab_mex_Fortran)
 
-if(_method STREQUAL "wrap")
+if(mex_method STREQUAL "wrap")
 
   add_custom_command(OUTPUT matsq.${Matlab_MEX_SUFFIX}
   COMMAND ${Matlab_MEX_COMPILER} -R2018a ${matsq_src}
@@ -92,14 +83,14 @@ if(_method STREQUAL "wrap")
 
   add_custom_target(matsq ALL DEPENDS matsq.${Matlab_MEX_SUFFIX})
 
-elseif(_method STREQUAL "find")
+elseif(mex_method STREQUAL "find")
   matlab_add_mex(NAME matsq SHARED SRC ${matsq_src})
 endif()
 
 endif()
 
 add_test(NAME FortranMex
-COMMAND ${Matlab_MAIN_PROGRAM} -sd ${PROJECT_SOURCE_DIR} -batch "buildtool test:mex:fortran"
+COMMAND ${Matlab_MAIN_PROGRAM} -sd ${PROJECT_SOURCE_DIR} -batch "buildtool test:mex"
 )
 set_property(TEST FortranMex PROPERTY DISABLED $<OR:$<NOT:$<TARGET_EXISTS:matsq>>,$<VERSION_LESS:${Matlab_VERSION},24.2>>)
 
