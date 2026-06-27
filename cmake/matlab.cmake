@@ -5,13 +5,13 @@ include(CheckSourceCompiles)
 
 # let default C++ version -- Matlab sets it recent enough.
 
-add_compile_definitions($<$<AND:$<BOOL:${MSVC}>,$<COMPILE_LANGUAGE:C,CXX>>:_CRT_SECURE_NO_WARNINGS>)
+# add_compile_definitions($<$<AND:$<BOOL:${MSVC}>,$<COMPILE_LANGUAGE:C,CXX>>:_CRT_SECURE_NO_WARNINGS>)
 
-if(CMAKE_Fortran_COMPILER_ID STREQUAL "GNU")
-  if(CMAKE_Fortran_COMPILER_VERSION VERSION_GREATER_EQUAL 10)
-    add_compile_options($<$<COMPILE_LANGUAGE:Fortran>:-fallow-invalid-boz>)
-  endif()
-endif()
+# if(CMAKE_Fortran_COMPILER_ID STREQUAL "GNU")
+#   if(CMAKE_Fortran_COMPILER_VERSION VERSION_GREATER_EQUAL 10)
+#     add_compile_options($<$<COMPILE_LANGUAGE:Fortran>:-fallow-invalid-boz>)
+#   endif()
+# endif()
 
 # matlab_add_mex etc. may redefine macros, but -Wno-macro-redefined is only available for Clang.
 # GCC gives the warning but doesn't have a way to disable the warning.
