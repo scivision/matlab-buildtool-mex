@@ -21,7 +21,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-22.04, macos-latest]
+        os: [ubuntu-latest, macos-latest]
         matlab: [R2026a]
 
 
@@ -71,10 +71,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-22.04, macos-latest, windows-latest]
+        os: [ubuntu-latest, macos-latest, windows-latest]
         matlab: [R2026a]
         include:
-        - os: ubuntu-22.04
+        - os: ubuntu-latest
           matlab: R2024b
 
     runs-on: ${{ matrix.os }}
