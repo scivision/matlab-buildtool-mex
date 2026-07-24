@@ -40,7 +40,7 @@ jobs:
         cache: true
 
     - &checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
 
     - name: CMake configure on Linux
       if: runner.os == 'Linux'
@@ -106,6 +106,8 @@ jobs:
       uses: matlab-actions/run-build@v3
       with:
         tasks: test:mex
+      env:
+        LD_PRELOAD: /usr/lib/x86_64-linux-gnu/libstdc++.so.6
 
 # Readme.md explains how Matlab Engine on Github Actions doesn't work
     - name: Test Matlab Engine
