@@ -85,18 +85,24 @@ This is because compiler-switching mechanisms like RHEL Developer Toolset still
 [use system libstdc++](https://stackoverflow.com/a/69146673)
 that lack newer GLIBCXX symbols.
 
-* R2022a .. R2024b: Linux: GCC 10
+* R2022a .. R2026b: Linux: GCC 10
 * R2020b .. R2021b: Linux: GCC 8
 
 A frequent issue on Linux systems is failure to link with libstdc++.so.6 correctly.
 Depending on the particular Matlab version and system libstdc++, putting Matlab libstdc++ first in LD_LIBRARY_PATH may help:
 
 ```sh
-LD_LIBRARY_PATH=<matlab_root>/sys/os/glnxa64/ cmake -Bbuild
+LD_LIBRARY_PATH=<matlab_root>/sys/os/glnxa64/ buildtool test:mex
 ```
 
-It may be necessary to try different Matlab versions to find one
-[Linux compatible](https://www.mathworks.com/support/requirements/matlab-linux.html)
+or for Ubuntu 24.04 like:
+
+```sh
+LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libstdc++.so.6 buildtool test:mex
+```
+
+Matlab releases have a range of
+[Linux compatibility](https://www.mathworks.com/support/requirements/matlab-linux.html)
 with the particular Linux operating system vendor and version.
 
 ## Reference
