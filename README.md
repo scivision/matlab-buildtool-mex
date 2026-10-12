@@ -4,7 +4,7 @@
 
 Examples of building Matlab MEX and Matlab Engine targets using
 [Matlab supported compilers](https://www.mathworks.com/support/requirements/supported-compilers.html).
-Since R2023b, Matlab's own build system has become quite capable and is recommended over CMake for new projects.
+Matlab's own build system has become quite capable and is recommended for Matlab projects.
 
 One-time setup from Matlab:
 

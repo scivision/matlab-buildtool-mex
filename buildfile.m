@@ -17,11 +17,12 @@ if ~isempty(fc)
     if str2double(fcMajor) < 10
       warning("GFortran 10 is recommended")
     end
-  elseif startsWith(fc.ShortName, "INTEL")
+  elseif startsWith(fc.ShortName, "INTEL") && isMATLABReleaseOlderThan("R2026a")
     if contains(fc.Details.CompilerFlags, "/fixed")
       % The mex_FORTRAN_win64.xml from fc.MexOpt contains COMPFLAGS=... /fixed ... that is
       % not wanted and breaks .F90 files. Removing this flags enables .F and .F90 to work
       % The user can do a one-time edit of this file to remove /fixed too.
+      % oneAPI is only available for Matlab on Windows.
       fcflags = sprintf('COMPFLAGS="%s"', strrep(fc.Details.CompilerFlags, '/fixed', ''));
     end
   end
